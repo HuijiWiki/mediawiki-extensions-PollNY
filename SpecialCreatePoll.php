@@ -67,10 +67,10 @@ class CreatePoll extends SpecialPage {
 			foreach( $wgCreatePollThresholds as $field => $threshold ) {
 				if ( $stats_data[$field] < $threshold ) {
 					$canCreate = false;
-					$threshold_reason .= ( ( $threshold_reason ) ? ', ' : '' ) . "$threshold $field";
+					$threshold_reason .= ( ( $threshold_reason ) ? ', ' : '' ) . "$threshold"."次编辑";
 				}
 			}
-
+			
 			if( $canCreate == false ) {
 				$wgSupressPageTitle = false;
 				$out->setPageTitle( $this->msg( 'poll-create-threshold-title' )->plain() );
@@ -120,6 +120,8 @@ class CreatePoll extends SpecialPage {
 			$newPageId = $article->getID();
 
 			$p = new Poll();
+			// print_r($request);
+			// echo $request->getVal( 'poll_question' );die();
 			$poll_id = $p->addPollQuestion(
 				$request->getVal( 'poll_question' ),
 				$request->getVal( 'poll_image_name' ),

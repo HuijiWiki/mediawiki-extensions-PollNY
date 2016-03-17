@@ -34,7 +34,7 @@ $wgPollDisplay['comments'] = false;
 
 // For example: 'edits' => 5 if you want to require users to have at least 5
 // edits before they can create new polls.
-$wgCreatePollThresholds = array();
+$wgCreatePollThresholds = array('edits' => 5);
 # End configuration values
 
 // New user right for voting in polls
@@ -44,6 +44,7 @@ $wgGroupPermissions['*']['pollny-vote'] = true;
 // New user right for administering polls
 $wgAvailableRights[] = 'polladmin';
 $wgGroupPermissions['sysop']['polladmin'] = true;
+$wgGroupPermissions['staff']['polladmin'] = true;
 
 // Set up the new special pages
 $wgMessagesDirs['PollNY'] = __DIR__ . '/i18n';
@@ -86,6 +87,8 @@ $wgHooks['ArticleFromTitle'][] = 'PollNYHooks::pollFromTitle';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'PollNYHooks::addTables';
 $wgHooks['RenameUserSQL'][] = 'PollNYHooks::onUserRename'; // For the Renameuser extension
 $wgHooks['CanonicalNamespaces'][] = 'PollNYHooks::onCanonicalNamespaces';
+$wgHooks['BeforeCreateEchoEvent'][] = 'Poll::onBeforeCreateEchoEvent';
+$wgHooks['EchoGetDefaultNotifiedUsers'][] = 'Poll::onEchoGetDefaultNotifiedUsers';
 
 // ResourceLoader support for MediaWiki 1.17+
 $wgResourceModules['ext.pollNY'] = array(

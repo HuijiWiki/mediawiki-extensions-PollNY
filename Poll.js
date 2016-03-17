@@ -62,25 +62,25 @@ var PollNY = {
 		}
 	},
 
-	/**
-	 * Skip the current poll and pick a new, random one.
-	 */
-	skip: function() {
-		PollNY.loadingLightBox();
-		jQuery.ajax({
-			type: 'POST',
-			url: mw.util.wikiScript( 'api' ),
-			data: {
-				action: 'pollny',
-				what: 'vote',
-				pollID: document.getElementById( 'poll_id' ).value,
-				choiceID: -1,
-				format: 'json'
-			}
-		} ).done( function() {
-			PollNY.goToNewPoll();
-		} );
-	},
+	// /**
+	//  * Skip the current poll and pick a new, random one.
+	//  */
+	// skip: function() {
+	// 	PollNY.loadingLightBox();
+	// 	jQuery.ajax({
+	// 		type: 'POST',
+	// 		url: mw.util.wikiScript( 'api' ),
+	// 		data: {
+	// 			action: 'pollny',
+	// 			what: 'vote',
+	// 			pollID: document.getElementById( 'poll_id' ).value,
+	// 			choiceID: -1,
+	// 			format: 'json'
+	// 		}
+	// 	} ).done( function() {
+	// 		PollNY.goToNewPoll();
+	// 	} );
+	// },
 
 	/**
 	 * Vote for a poll and move to the next poll.
@@ -192,7 +192,8 @@ var PollNY = {
 					status: status,
 					format: 'json'
 				}
-			} ).done( function() {
+			} ).done( function(data) {
+				console.log(data);
 				window.location.reload();
 			} );
 		}
@@ -461,9 +462,9 @@ jQuery( document ).ready( function() {
 			PollNY.vote();
 		} );
 
-		jQuery( 'a.poll-skip-link' ).on( 'click', function() {
-			PollNY.skip();
-		} );
+		// jQuery( 'a.poll-skip-link' ).on( 'click', function() {
+		// 	PollNY.skip();
+		// } );
 
 		jQuery( 'a.poll-next-poll-link' ).on( 'click', function() {
 			PollNY.loadingLightBox();

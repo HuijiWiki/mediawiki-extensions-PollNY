@@ -301,11 +301,11 @@ class SpecialPollAjaxUpload extends SpecialUpload {
 		// tricky to fix.
 		// This is no longer true since I've added the is_object() checks to
 		// all social extensions (IIRC) that call wfFindFile somewhere.
-		$imgName = $img->getTitle()->getDBkey();
-		echo "<script language=\"javascript\">
-			/*<![CDATA[*/
-			window.parent.PollNY.uploadComplete(\"{$slashedImgTag}\", \"{$imgName}\", '');
-			/*]]>*/</script>";
+		// $imgName = $img->getTitle()->getDBkey();
+		// echo "<script language=\"javascript\">
+		// 	/*<![CDATA[*/
+		// 	window.parent.PollNY.uploadComplete(\"{$slashedImgTag}\", \"{$imgName}\", '');
+		// 	/*]]>*/</script>";
 	}
 }
 

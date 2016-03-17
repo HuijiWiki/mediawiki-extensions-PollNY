@@ -49,7 +49,7 @@ class ApiPollNY extends ApiBase {
 			}
 		} elseif ( $action == 'updateStatus' ) {
 			$status = $params['status'];
-			if ( !$status || $status === null || !is_numeric( $status ) ) {
+			if ( $status === null || !is_numeric( $status ) ) {
 				$this->dieUsageMsg( 'missingparam' );
 			}
 		} elseif ( $action == 'titleExists' ) {
@@ -157,8 +157,8 @@ class ApiPollNY extends ApiBase {
 			$output .= "<div class=\"poll-choice\">
 		<div class=\"poll-choice-left\">{$choice['choice']} ({$choice['percent']}%)</div>";
 
-			$output .= "<div class=\"poll-choice-right\">{$bar_img} <span class=\"poll-choice-votes\">" .
-				wfMessage( 'poll-votes', $choice['votes'] )->parse() .
+			$output .= "<div class=\"poll-choice-right\" style=\"width:{$choice['percent']}%\"> <span class=\"poll-choice-votes\">" .
+				wfMessage( 'poll-votes', $choice['votes'] )->parse() . PollPage::getFollowingUserPolls($choice['vote_users']).
 				'</span></div>';
 			$output .= '</div>';
 
@@ -189,12 +189,18 @@ class ApiPollNY extends ApiBase {
 	}
 
 	function updateStatus( $pollID, $status ) {
+		// return $status;
 		if(
-			$status == 2 ||
-			$this->poll->doesUserOwnPoll( $this->getUser()->getID(), $pollID ) ||
+			$status > 0 &&
+			( $this->poll->doesUserOwnPoll( $this->getUser()->getID(), $pollID ) ||
+			$this->getUser()->isAllowed( 'polladmin' ) )
+		) {
+			$this->poll->updatePollStatus( $pollID, $status );
+			return 'Status successfully changed';
+		} elseif (
+			$status == 0 &&
 			$this->getUser()->isAllowed( 'polladmin' )
-		)
-		{
+		) {
 			$this->poll->updatePollStatus( $pollID, $status );
 			return 'Status successfully changed';
 		} else {

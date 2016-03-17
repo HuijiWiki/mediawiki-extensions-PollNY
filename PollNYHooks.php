@@ -205,7 +205,10 @@ class PollNYHooks {
 			$poll_title = Title::newFromText( $poll_name, NS_POLL );
 			$poll_title = PollNYHooks::followPollID( $poll_title );
 			$poll_page_id = $poll_title->getArticleID();
-
+			// if ( $wgUser->getID() == 0 ) {
+			// 	$output = '<h1>no login</h1>';
+			// 	return $output;
+			// }
 			if( $poll_page_id > 0 ) {
 				$p = new Poll();
 				$poll_info = $p->getPoll( $poll_page_id );
@@ -213,21 +216,7 @@ class PollNYHooks {
 				$output = "\t\t" . '<div class="poll-embed-title">' .
 					$poll_info['question'] .
 				'</div>' . "\n";
-				if( $poll_info['image'] ) {
-					$poll_image_width = 100;
-					$poll_image = wfFindFile( $poll_info['image'] );
-					$width = $poll_image_url = '';
-					if ( is_object( $poll_image ) ) {
-						$poll_image_url = $poll_image->createThumb( $poll_image_width );
-						if ( $poll_image->getWidth() >= $poll_image_width ) {
-							$width = $poll_image_width;
-						} else {
-							$width = $poll_image->getWidth();
-						}
-					}
-					$poll_image_tag = '<img width="' . $width . '" alt="" src="' . $poll_image_url . '" />';
-					$output .= "\t\t<div class=\"poll-image\">{$poll_image_tag}</div>\n";
-				}
+
 
 				// If the user hasn't voted for this poll yet, they're allowed
 				// to do so and the poll is open for votes, display the question
@@ -238,19 +227,27 @@ class PollNYHooks {
 					$poll_info['status'] == 1
 				)
 				{
-					$wgOut->addModules( 'ext.pollNY' );
-					$output .= "<div id=\"loading-poll_{$poll_info['id']}\" class=\"poll-loading-msg\">" . wfMessage( 'poll-js-loading' )->text() . '</div>';
-					$output .= "<div id=\"poll-display_{$poll_info['id']}\" style=\"display:none;\">";
-					$output .= "<form name=\"poll_{$poll_info['id']}\"><input type=\"hidden\" id=\"poll_id_{$poll_info['id']}\" name=\"poll_id_{$poll_info['id']}\" value=\"{$poll_info['id']}\"/>";
+					if ( !$wgUser->isLoggedIn() ) {
+						$register_title = SpecialPage::getTitleFor( 'Userlogin', 'signup' );
+						$output .= '<div class="c-form-message">' . wfMessage(
+								'poll-nologin-message',
+								htmlspecialchars( $register_title->getFullURL() )
+							)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
+					}else{
+						$wgOut->addModules( 'ext.pollNY' );
+						$output .= "<div id=\"loading-poll_{$poll_info['id']}\" class=\"poll-loading-msg\">" . wfMessage( 'poll-js-loading' )->text() . '</div>';
+						$output .= "<div id=\"poll-display_{$poll_info['id']}\" style=\"display:none;\">";
+						$output .= "<form name=\"poll_{$poll_info['id']}\"><input type=\"hidden\" id=\"poll_id_{$poll_info['id']}\" name=\"poll_id_{$poll_info['id']}\" value=\"{$poll_info['id']}\"/>";
 
-					foreach( $poll_info['choices'] as $choice ) {
-						$output .= "<div class=\"poll-choice\">
-						<input type=\"radio\" name=\"poll_choice\" data-poll-id=\"{$poll_info['id']}\" data-poll-page-id=\"{$poll_page_id}\" id=\"poll_choice\" value=\"{$choice['id']}\">{$choice['choice']}
-						</div>";
+						foreach( $poll_info['choices'] as $choice ) {
+							$output .= "<div class=\"poll-choice\">
+							<input type=\"radio\" name=\"poll_choice\" data-poll-id=\"{$poll_info['id']}\" data-poll-page-id=\"{$poll_page_id}\" id=\"poll_choice\" value=\"{$choice['id']}\">{$choice['choice']}
+							</div>";
+						}
+
+						$output .= '</form>';
 					}
-
-					$output .= '</form>
-						</div>';
+					$output .= '</div>';
 				} else {
 					// Display message if poll has been closed for voting
 					if( $poll_info['status'] == 0 ) {
@@ -259,16 +256,16 @@ class PollNYHooks {
 					}
 
 					$x = 1;
-
+					$output .= '<div class="poll-wrap">';
 					foreach( $poll_info['choices'] as $choice ) {
 						//$percent = round( $choice['votes'] / $poll_info['votes'] * 100 );
 						if( $poll_info['votes'] > 0 ) {
 							$bar_width = floor( 480 * ( $choice['votes'] / $poll_info['votes'] ) );
 						}
-						$bar_img = "<img src=\"{$wgExtensionAssetsPath}/SocialProfile/images/vote-bar-{$x}.gif\" border=\"0\" class=\"image-choice-{$x}\" style=\"width:{$choice['percent']}%;height:12px;\" alt=\"\" />";
 
 						$output .= "<div class=\"poll-choice\">
-						<div class=\"poll-choice-left\">{$choice['choice']} ({$choice['percent']}%)</div>";
+						<div class=\"poll-choice-left\">{$choice['choice']} ({$choice['percent']}%) <span class=\"poll-choice-votes\">" .
+							wfMessage( 'poll-votes', $choice['votes'] )->parse() . PollPage::getFollowingUserPolls($choice['vote_users'])."</span></div>";
 
 						// If the amount of votes is not set, set it to 0
 						// This fixes an odd bug where "votes" would be shown
@@ -277,8 +274,7 @@ class PollNYHooks {
 							$choice['votes'] = 0;
 						}
 
-						$output .= "<div class=\"poll-choice-right\">{$bar_img} <span class=\"poll-choice-votes\">" .
-							wfMessage( 'poll-votes', $choice['votes'] )->parse() . '</span></div>';
+						$output .= "<div class=\"poll-choice-right\" style=\"width:{$choice['percent']}%\"></div>";
 						$output .= '</div>';
 
 						$x++;
@@ -295,7 +291,7 @@ class PollNYHooks {
 					}
 					$output .= '<div class="poll-timestamp">' .
 						wfMessage( 'poll-createdago', Poll::getTimeAgo( $poll_info['timestamp'] ) )->parse() .
-					'</div>';
+					'</div></div>';
 				}
 
 				return $output;

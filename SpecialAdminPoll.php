@@ -51,7 +51,7 @@ class AdminPoll extends SpecialPage {
 		$out->addModules( 'ext.pollNY' );
 
 		// Pagination
-		$per_page = 20;
+		$per_page = 10;
 		$page = $request->getInt( 'page', 1 );
 
 		$current_status = $request->getVal( 'status' );
@@ -132,16 +132,11 @@ class AdminPoll extends SpecialPage {
 			array( 'page' => array( 'INNER JOIN', 'poll_page_id = page_id' ) )
 		);
 
-		if( $status_int > -1 ) {
-			$where['poll_status'] = $status;
-		}
-
 		$s = $dbr->selectRow(
 			'poll_question',
 			array( 'COUNT(*) AS count' ),
 			$where,
-			__METHOD__,
-			$params
+			__METHOD__
 		);
 
 		$total = $s->count;
@@ -171,7 +166,6 @@ class AdminPoll extends SpecialPage {
 
 			$p = new Poll();
 			$poll_choices = $p->getPollChoices( $row->poll_id );
-
 			if( ( $x < $dbr->numRows( $res ) ) && ( $x % $per_page != 0 ) ) {
 				$output .= "<div class=\"view-poll-row\" id=\"{$rowId}\">";
 			} else {
@@ -186,7 +180,10 @@ class AdminPoll extends SpecialPage {
 					<p><b><a href=\"{$poll_url}\">{$poll_title}</a></b></p>
 					<p>";
 			foreach( $poll_choices as $choice ) {
-				$output .= "{$choice['choice']}<br />";
+				$choiceVotesNum = empty($choice['votes']) ? 0 : $choice['votes'];
+				$choiceNumDown = ($poll_answers == 0) ? 1 : $poll_answers;
+				$voteWidth = 100*$choice['votes']/$choiceNumDown;
+				$output .= "<span class='poll-vote-choice'>{$choice['choice']}-{$choiceVotesNum}票</span><div class='poll-vote-num' style='width:{$voteWidth}%'></div>";
 			}
 			$output .= '</p>
 						<p class="view-poll-num-answers">' .
@@ -199,7 +196,7 @@ class AdminPoll extends SpecialPage {
 								'poll-ago',
 								Poll::getTimeAgo( $poll_date )
 							)->parse() . ")</p>
-						<div id=\"poll-{$row->poll_id}-controls\">";
+						<div class=\"poll-del-edit\" id=\"poll-{$row->poll_id}-controls\">";
 			if( $row->poll_status == 2 ) {
 				$output .= "<a class=\"poll-unflag-link\" href=\"javascript:void(0)\" data-poll-id=\"{$row->poll_id}\">" .
 					$this->msg( 'poll-unflag-poll' )->text() . '</a>';
@@ -225,7 +222,7 @@ class AdminPoll extends SpecialPage {
 		$output .= '</div>
 		<div class="visualClear"></div>';
 
-		$output .= $this->buildPagination( $total, $per_page, $page );
+		$output .= $this->buildPagination( $total, $per_page, $page, $current_status );
 
 		$out->addHTML( $output );
 	}
@@ -239,66 +236,70 @@ class AdminPoll extends SpecialPage {
 	 * @param $page Integer: number indicating on which page we are
 	 * @return String: HTML
 	 */
-	public function buildPagination( $total, $perPage, $page ) {
+	public function buildPagination( $total, $per_page, $page, $current_status ) {
 		$output = '';
-		$numofpages = $total / $perPage;
-		$viewPoll = SpecialPage::getTitleFor( 'ViewPoll' );
+	    $pcount = $total;
+	    $numofpages = $pcount / $per_page;
 
-		if( $numofpages > 1 ) {
-			$output .= '<div class="view-poll-page-nav">';
+	    $page_link = $this->getPageTitle();
 
-			if( $page > 1 ) {
-				$output .= Linker::link(
-					$viewPoll,
-					$this->msg( 'poll-prev' )->text(),
-					array(),
-					array(
-						'type' => 'most',
-						'page' => ( $page - 1 )
-					)
-				) . $this->msg( 'word-separator' )->plain();
-			}
+	    if ( $numofpages > 1 ) {
+			$output .= '<div class="page-nav-wrapper"><nav class="page-nav pagination">';
 
-			if( ( $total % $per_page ) != 0 ) {
-				$numofpages++;
-			}
-			if( $numofpages >= 9 && $page < $total ) {
-				$numofpages = 9 + $page;
-			}
-			if( $numofpages >= ( $total / $per_page ) ) {
-				$numofpages = ( $total / $per_page ) + 1;
-			}
-
-			for( $i = 1; $i <= $numofpages; $i++ ) {
-				if( $i == $page ) {
-					$output .= ( $i . ' ' );
-				} else {
-					$output .= Linker::link(
-						$viewPoll,
-						$i,
-						array(),
-						array(
-							'type' => 'most',
-							'page' => $i
-						)
-					) . $this->msg( 'word-separator' )->plain();
-				}
-			}
-
-			if( ( $total - ( $per_page * $page ) ) > 0 ) {
-				$output .= $this->msg( 'word-separator' )->plain() .
+			if ( $page > 1 ) {
+				$output .= '<li>'.
 					Linker::link(
-						$viewPoll,
-						$this->msg( 'poll-next' )->text(),
-						array(),
-						array(
-							'type' => 'most',
-							'page' => ( $page + 1 )
-						)
-					);
+					    $page_link,
+					    '<span aria-hidden="true">&laquo;</span>',
+					    array(),
+					    array(
+					      'page' => ( $page - 1 ),
+					      'status' => $current_status
+					    )
+					) . '</li>';
 			}
 
-			$output .= '</div>';
+			if ( ( $pcount % $per_page ) != 0 ) {
+			$numofpages++;
+			}
+			// if ( $numofpages >= 9 && $page < $pcount ) {
+			//   $numofpages = 9 + $page;
+			// }
+			// if ( $numofpages >= ( $total / $per_page ) ) {
+			//  $numofpages = ( $total / $per_page ) + 1;
+			// }
+
+			for ( $i = 1; $i <= $numofpages; $i++ ) {
+			if ( $i == $page ) {
+			   $output .= ( '<li class="active"><a href="#">'.$i.' <span class="sr-only">(current)</span></a></li>' );
+			} else {
+			    $output .= '<li>' .
+				    Linker::link(
+					    $page_link,
+					    $i,
+					    array(),
+					    array(
+					        'page' => $i,
+						    'status' => $current_status
+					    )
+				  ).'</li>';
+			}
+			}
+
+			if ( ( $pcount - ( $per_page * $page ) ) > 0 ) {
+				$output .= '<li>' .
+				    Linker::link(
+					    $page_link,
+					    '<span aria-hidden="true">&raquo;</span>',
+					    array(),
+					    array(
+					        'page' => ( $page + 1 ),
+						    'status' => $current_status
+					    )
+				  ).'</li>';  
+			}
+
+			$output .= '</nav></div>';
 		}
 
 		return $output;

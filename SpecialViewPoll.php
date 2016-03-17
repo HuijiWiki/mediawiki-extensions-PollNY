@@ -44,7 +44,7 @@ class ViewPoll extends SpecialPage {
 		$user_link = '';
 
 		// Pagination
-		$per_page = 20;
+		$per_page = 10;
 		$page = $request->getInt( 'page', 1 );
 
 		$limit = $per_page;
@@ -187,64 +187,79 @@ class ViewPoll extends SpecialPage {
 		$output .= '</div>
 		<div class="visualClear"></div>';
 
-		$numofpages = $total / $per_page;
+		/**
+	     * Build next/prev nav
+	     */
+	    // $pcount = count($allVideo);
+	    $pcount = $total;
+	    $numofpages = $pcount / $per_page;
 
-		if( $numofpages > 1 ) {
-			$output .= '<div class="view-poll-page-nav">';
-			if( $page > 1 ) {
-				$output .= Linker::link(
-					$thisTitle,
-					$this->msg( 'poll-prev' )->text(),
-					array(),
-					array(
-						'type' => 'most',
-						'page' => ( $page - 1 )
-					) + $userLink
-				) . $this->msg( 'word-separator' )->plain();
-			}
+	    $page_link = $this->getPageTitle();
 
-			if( ( $total % $per_page ) != 0 ) {
-				$numofpages++;
-			}
-			if( $numofpages >= 9 && $page < $total ) {
-				$numofpages = 9 + $page;
-			}
-			if( $numofpages >= ( $total / $per_page ) ) {
-				$numofpages = ( $total / $per_page ) + 1;
-			}
+	    if ( $numofpages > 1 ) {
+			$output .= '<div class="page-nav-wrapper"><nav class="page-nav pagination">';
 
-			for( $i = 1; $i <= $numofpages; $i++ ) {
-				if( $i == $page ) {
-					$output .= ( $i . ' ' );
-				} else {
-					$output .= Linker::link(
-						$thisTitle,
-						$i,
-						array(),
-						array(
-							'type' => 'most',
-							'page' => $i
-						) + $userLink
-					) . $this->msg( 'word-separator' )->plain();
-				}
+			if ( $page > 1 ) {
+				$output .= '<li>'.
+					Linker::link(
+					    $page_link,
+					    '<span aria-hidden="true">&laquo;</span>',
+					    array(),
+					    array(
+					      'page' => ( $page - 1 ),
+					      'user' => $user,
+					      'type' => $type
+					    )
+					) . '</li>';
 			}
 
-			if( ( $total - ( $per_page * $page ) ) > 0 ) {
-				$output .= $this->msg( 'word-separator' )->plain() . Linker::link(
-					$thisTitle,
-					$i,
-					array(),
-					array(
-						'type' => 'most',
-						'page' => ( $page + 1 )
-					) + $userLink
-				);
+			if ( ( $pcount % $per_page ) != 0 ) {
+			$numofpages++;
 			}
-			$output .= '</div>';
+			// if ( $numofpages >= 9 && $page < $pcount ) {
+			//   $numofpages = 9 + $page;
+			// }
+			// if ( $numofpages >= ( $total / $per_page ) ) {
+			//  $numofpages = ( $total / $per_page ) + 1;
+			// }
+
+			for ( $i = 1; $i <= $numofpages; $i++ ) {
+			if ( $i == $page ) {
+			   $output .= ( '<li class="active"><a href="#">'.$i.' <span class="sr-only">(current)</span></a></li>' );
+			} else {
+			    $output .= '<li>' .
+				    Linker::link(
+					    $page_link,
+					    $i,
+					    array(),
+					    array(
+					        'page' => $i,
+						    'user' => $user,
+						    'type' => $type
+					    )
+				  ).'</li>';
+			}
+			}
+
+			if ( ( $pcount - ( $per_page * $page ) ) > 0 ) {
+				$output .= '<li>' .
+				    Linker::link(
+					    $page_link,
+					    '<span aria-hidden="true">&raquo;</span>',
+					    array(),
+					    array(
+					        'page' => ( $page + 1 ),
+						    'user' => $user,
+						    'type' => $type
+					    )
+				  ).'</li>';  
+			}
+
+			$output .= '</nav></div>';
+			}
+
+			$out->addHTML( $output );
 		}
-
-		$out->addHTML( $output );
-	}
 
 	protected function getGroupName() {
 		return 'poll';

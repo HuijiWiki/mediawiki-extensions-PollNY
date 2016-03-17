@@ -1,15 +1,26 @@
 /* CSS for PollNY extension */
+.ns-300 #content h1{
+	display:none;
+}
 #lightbox {
 	padding: 10px;
 	display: none;
 }
-
+#content p{
+    margin-bottom: 0;
+}
 #lightbox img {
 	background-color: transparent;
 	border: none;
 	clear: both;
 }
-
+body:not(.ns-0) #firstHeading{
+    text-align: center;
+}
+.page-特殊_管理员投票 #mw-content-text{
+    background: #f9f9f9;
+    padding: 10px 15px;
+}
 #lightboxText {
 	color: white;
 	width: auto;
@@ -41,18 +52,30 @@
 
 /* Create Form */
 .create-poll-top {
-	background-color: #F2F4F7;
-	border: 1px solid #DCDCDC;
-	margin: 0px 0px 15px;
-	padding: 9px;
-	width: 500px;
+    border: 1px dashed #999;
+    margin: 0px 0px 25px;
+    padding: 9px;
+    width: 500px;
 }
-
+.site-button{
+    border-radius: 1px;
+}
+.create-poll-top .site-button{
+    background: #428BCA;
+    color: #fff;
+    margin-top: 20px;
+}
+.create-poll-top h4{
+    margin-bottom: 40px;
+}
 .create-poll-top h1 {
 	font-size: 22px;
 	font-color: #333333;
 	border-bottom: none;
 	margin: 0px 0px 10px 0px !important;
+}
+.text-area{
+    margin-top: 0!important;
 }
 
 .create-poll-question-and-answer h1, .create-poll-image h1 {
@@ -62,7 +85,9 @@
 	font-weight: bold;
 	margin: 20px 0px 10px 0px !important;
 }
-
+.create-poll-question-and-answer h4{
+    margin: 20px 0 5px 0;
+}
 .create-poll-answer {
 	margin: 0px 0px 8px 0px;
 }
@@ -108,7 +133,6 @@
 	font-size: 14px;
 	font-weight: bold;
 	margin: 7px 0px 0px 0px;
-	color: #797979;
 }
 
 .previous-poll-choice-left {
@@ -184,10 +208,15 @@
 }
 
 .poll-choice-votes {
-	font-size: 12px;
-	color: #000000;
+	font-size: 15px;
+    display: inline-block;
+    color:rgb(121, 121, 121);
+    padding-left: 5px;
 }
-
+.poll-total-votes {
+    text-align: center;
+    margin-top: 20px;
+}
 .submitted-by-image {
 	float: left;
 	width: 60px;
@@ -219,6 +248,9 @@
 	vertical-align: middle;
 	margin: 0px 1px 0px 0px;
 }
+.submitted-by-user ul{
+	margin: 0px !important;
+}
 
 .submitted-by-user a {
 	font-size: 14px;
@@ -226,15 +258,20 @@
 	text-decoration: none;
 }
 
+.poll-wrap{
+    max-width: 600px;
+    padding: 10px 5px;
+    border: 1px dashed #999;
+}
 .poll-choice {
 	font-size: 16px;
 	font-weight: bold;
 	margin: 0px 0px 6px 0px;
-	color: #797979;
 }
 
 .poll-choice-left {
 	margin: 10px 0px 3px 0px;
+    display: inline-block;
 }
 
 .image-choice-1 {
@@ -466,14 +503,14 @@
 
 .view-poll-row {
 	border-bottom: 1px solid #DCDCDC;
-	height: 60px;
+	/*height: 60px;*/
 	padding: 15px 0px 15px 5px;
 	width: 600px;
 	cursor: pointer;
 }
 
 .view-poll-row-bottom {
-	height: 60px;
+	/*height: 60px;*/
 	padding: 15px 0px 15px 5px;
 	width: 600px;
 	cursor: pointer;
@@ -484,7 +521,7 @@
 	font-size: 18px;
 	font-weight: bold;
 	float: left;
-	margin: 0px 25px 0px 0px;
+	margin: 0px 15px 0px 0px;
 }
 
 .view-poll-user-image {
@@ -498,7 +535,8 @@
 	font-size: 14px;
 	color: #002BB8;
 	font-weight: bold;
-	margin: 0px 65px 0px 0px;
+	margin-right: 10px;
+	/*margin: 0px 65px 0px 0px;*/
 }
 
 .view-poll-text {
@@ -574,17 +612,41 @@
 .poll-timestamp {
 	font-size: 12px;
 	color: #666666;
-	margin-top: 15px;
+	text-align: center;
 }
 
 /* Make the title of embedded polls bigger than the normal page text (duh...) */
 .poll-embed-title {
-	font-size: 200%;
 	padding-top: 5px;
 	padding-bottom: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 /* No borders around the various images we use */
 .poll, .poll-right img {
 	border: 0;
+}
+
+.poll-vote-num, .poll-choice-right{
+	height: 20px;
+	font-weight: bold;
+	letter-spacing: 0px;
+	background: #428BCA;
+	margin-bottom: 5px; 
+	padding: 1px;
+	font-size: 16px;
+	color: #ffffff;
+}
+
+.poll-vote-choice, .poll-del-edit{
+	font-size: 14px;
+}
+
+.poll-user{
+	padding-left: 10px;
+	font-size: 10px;
+    display: inline-block;
+    color:rgb(121, 121, 121)
 }

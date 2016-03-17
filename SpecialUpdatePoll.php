@@ -145,7 +145,7 @@ class UpdatePoll extends UnlistedSpecialPage {
 			<input type=\"hidden\" name=\"prev_poll_id\" value=\"" . $request->getInt( 'prev_id' ) . '" />
 			<input type="hidden" name="poll_image_name" id="poll_image_name" />
 
-			<h1>' . $this->msg( 'poll-edit-answers' )->text() . '</h1>';
+			<h3>' . $this->msg( 'poll-edit-answers' )->text() . '</h3>';
 
 		$x = 1;
 		foreach( $poll_info['choices'] as $choice ) {
@@ -174,28 +174,9 @@ class UpdatePoll extends UnlistedSpecialPage {
 		$form .= '</form>
 			</div><!-- .update-poll-left -->
 
-			<div class="update-poll-right">
-			<h1>' . $this->msg( 'poll-edit-image' )->plain() . "</h1>
-			<div id=\"poll_image\" class=\"update-poll-image\">{$poll_image_tag}</div>
-
-			<!--
-				<div id=\"fake-form\" style=\"display:block;height:70px;\">
-					<input type=\"file\" size=\"40\" disabled=\"disabled\" />
-					<div style=\"margin:9px 0px 0px 0px;\">
-						<input type=\"button\" value=\"Upload\"/>
-					</div>
-				</div>
-			-->
-			<div id=\"real-form\" style=\"display:block;height:90px;\">
-				<iframe id=\"imageUpload-frame\" class=\"imageUpload-frame\" width=\"610\"
-					scrolling=\"no\" frameborder=\"0\" src=\"" .
-					htmlspecialchars( SpecialPage::getTitleFor( 'PollAjaxUpload' )->getFullURL( 'wpThumbWidth=75' ) ) . '">
-				</iframe>
-			</div>
-
-		</div>
+			
 		<div class="visualClear"></div>
-		<div class="update-poll-warning">' . $this->msg( $copywarnMsg, $copywarnMsgParams )->parse() . "</div>
+		<!--<div class="update-poll-warning">' . $this->msg( $copywarnMsg, $copywarnMsgParams )->parse() . "</div>-->
 		<div class=\"update-poll-buttons\">
 			<input type=\"button\" class=\"site-button\" value=\"" . $this->msg( 'poll-edit-button' )->plain() . "\" size=\"20\" onclick=\"document.form1.submit()\" />
 			<input type=\"button\" class=\"site-button\" value=\"" . $this->msg( 'poll-cancel-button' )->plain() . "\" size=\"20\" onclick=\"window.location='" . $poll_page->getFullURL( $prev_qs ) . "'\" />

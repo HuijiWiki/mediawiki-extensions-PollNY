@@ -77,6 +77,7 @@ class Poll {
 			$this->incChoiceVoteCount( $choiceID );
 			$stats = new UserStatsTrack( $wgUser->getID(), $wgUser->getName() );
 			$stats->incStatField( 'poll_vote' );
+			self::sendEchoNotification($pollID);
 		}
 	}
 
@@ -170,7 +171,7 @@ class Poll {
 		$choices = array();
 		foreach( $res as $row ) {
 			if( $poll_vote_count ) {
-				$percent = str_replace( '.0', '', $wgLang->formatNum( $row->pc_vote_count / $poll_vote_count * 100, 1 ) );
+				$percent = str_replace( '.0', '', number_format( $row->pc_vote_count / $poll_vote_count * 100, 2 ) );
 			} else {
 				$percent = 0;
 			}
@@ -180,11 +181,39 @@ class Poll {
 				'id' => $row->pc_id,
 				'choice' => $row->pc_text,
 				'votes' => $row->pc_vote_count,
-				'percent' => $percent
+				'percent' => $percent,
+				'vote_users' => $this->getPollUsersByPid( $row->pc_id )
 			);
 		}
 
 		return $choices;
+	}
+
+	/**
+	 * Get all poll this choice users by poll_choice_id
+	 * @param int $pc_id poll_choice_id
+	 * @return Array all anwsers who chocie this id
+	 */
+	public function getPollUsersByPid( $pc_id ){
+		$dbr = wfGetDB( DB_SLAVE );
+
+		$res = $dbr->select(
+			'poll_user_vote',
+			array( 'pv_user_id', 'pv_user_name' ),
+			array( 'pv_pc_id' => $pc_id ),
+			__METHOD__,
+			array( 'ORDER BY' => 'pv_date' )
+		);
+		if ( $res ) {
+			$result = array();
+			foreach ($res as $key => $value) {
+				$result[] = array(
+					'pv_user_id' => $value->pv_user_id,
+					'pv_user_name' => $value->pv_user_name
+				);
+			}
+			return $result;
+		}
 	}
 
 	/**
@@ -418,5 +447,156 @@ class Poll {
 		}
 		return $timeStr;
 	}
+
+	static function getPollInfoById( $pollID ){
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select(
+			'poll_question',
+			array(
+				'poll_page_id',
+				'poll_user_id',
+				'poll_user_name',
+				'poll_text',
+				'poll_status',
+				'poll_vote_count',
+				'poll_question_vote_count',
+				'poll_date'
+			),
+			array(
+				'poll_id'=>$pollID
+			),
+			__METHOD__
+		);
+		if ( $res ) {
+			$result = array();
+			foreach ($res as $key => $value) {
+				$result = array(
+						'p_page_id' => $value->poll_page_id,
+						'p_user_id' => $value->poll_user_id,
+						'p_user_name' => $value->poll_user_name,
+						'p_text' => $value->poll_text,
+						'p_status' => $value->poll_status,
+						'p_vote_count' => $value->poll_vote_count,
+						'p_question_vote_count' => $value->poll_question_vote_count,
+						'poll_date' => $value->poll_date
+					);
+			}
+			return $result;
+		}
+
+	}
+
+	static function sendEchoNotification( $pollID, $mentionedUsers = null ){
+		global $wgUser;
+		$userInfo = self::getPollInfoById( $pollID );
+		$page_id = isset( $userInfo['p_page_id'] ) ? $userInfo['p_page_id'] : 0;
+		$pageTitle = Title::newFromID( $page_id );
+		$userIdTo = isset( $userInfo['p_user_id'] ) ? $userInfo['p_user_id'] : 0;
+		$content = isset( $userInfo['p_text'] ) ? $userInfo['p_text'] : '';
+		$userIdFrom = $wgUser->getID();
+		EchoEvent::create( array(
+		     'type' => 'poll-msg',
+		     'extra' => array(
+		         'poll-recipient-id' => $userIdTo,  
+		         'poll-content' => $content,
+		         'poll-id' => "poll-{$pollID}",
+		     ),
+		     'from' => $userIdFrom,
+		     'agent' => $wgUser,
+		     'title' => $pageTitle,
+		) );
+	}
+
+	public static function onBeforeCreateEchoEvent( &$notifications, &$notificationCategories, &$icons ) {
+        $notificationCategories['poll-msg'] = array(
+            'priority' => 3,
+            'tooltip' => 'echo-pref-tooltip-poll-msg',
+        );
+        $notifications['poll-msg'] = array(
+            'category' => 'poll-msg',
+            'group' => 'positive',
+            'formatter-class' => 'EchoPollFormatter',
+            'title-message' => 'notification-poll',
+            'title-params' => array( 'agent', 'reply', 'detail' ),
+            'flyout-message' => 'notification-poll-flyout',
+            'flyout-params' => array( 'agent', 'reply', 'detail' ),
+            'payload' => array( 'summary' ),
+            'email-subject-message' => 'notification-poll-email-subject',
+            'email-subject-params' => array( 'agent' ),
+            'email-body-message' => 'notification-poll-email-body',
+            'email-body-params' => array( 'agent', 'main-title-text', 'email-footer' ),
+            'email-body-batch-message' => 'notification-poll-email-batch-body',
+            'email-body-batch-params' => array( 'agent', 'main-title-text' ),
+            'icon' => 'chat',
+        );
+        return true;
+    }
+    /**
+	* Used to define who gets the notifications (for example, the user who performed the edit)
+	* 
+    *
+	*@see https://www.mediawiki.org/wiki/Echo_%28Notifications%29/Developer_guide
+	*/
+	public static function onEchoGetDefaultNotifiedUsers( $event, &$users ) {
+	 	switch ( $event->getType() ) {
+	 		case 'poll-msg':
+	 			$extra = $event->getExtra();
+	 			if ( !$extra ){
+	 				break;
+	 			}
+	 			if ( !isset( $extra['poll-recipient-id'] ) ) {
+	 				break;
+	 			}
+
+	 			$recipientId = $extra['poll-recipient-id'];
+	 			$recipient = User::newFromId($recipientId);
+	 			$users[$recipientId] = $recipient;
+	 			break;
+	 	}
+	 	return true;
+	}
+
+}
+class EchoPollFormatter extends EchoBasicFormatter {
+
+	protected function formatPayload( $payload, $event, $user ) {
+		switch ( $payload ) {
+		   	case 'summary': 
+				$eventData = $event->getExtra();
+	        	if ( !isset( $eventData['poll-content']) ) {
+	                return;
+	            }
+			    return $eventData['poll-content'];
+		        break;
+		   	default:
+		        return parent::formatPayload( $payload, $event, $user );
+		        break;
+		}
+	}
+		
+    
+
+   /**
+     * @param $event EchoEvent
+     * @param $param
+     * @param $message Message
+     * @param $user User
+     */
+    protected function processParam( $event,$params, $message, $user ) {
+    	$eventData = $event->getExtra();
+    	$titleData = $event->getTitle()->getPrefixedText();
+    	if ( !isset( $eventData['poll-id']) ) {
+            $eventData['poll-id'] = null;
+        }
+        $this->setTitleLink(
+            $event,
+            $message,
+            array(
+                'class' => 'mw-echo-poll-msg',
+              	'linkText' => wfMessage('notification-poll-check')->text(),
+            )
+        );                    	
+
+    }
 
 }
