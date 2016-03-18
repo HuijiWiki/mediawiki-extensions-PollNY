@@ -171,7 +171,8 @@ class Poll {
 		$choices = array();
 		foreach( $res as $row ) {
 			if( $poll_vote_count ) {
-				$percent = str_replace( '.0', '', number_format( $row->pc_vote_count / $poll_vote_count * 100, 2 ) );
+				$percent = str_replace( '.00', '', number_format( $row->pc_vote_count / $poll_vote_count * 100, 2 ) );
+				//echo $percent;
 			} else {
 				$percent = 0;
 			}

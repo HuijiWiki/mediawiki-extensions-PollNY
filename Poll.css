@@ -268,6 +268,11 @@ body:not(.ns-0) #firstHeading{
 	font-weight: bold;
 	margin: 0px 0px 6px 0px;
 }
+.poll-choice input[type=radio], .poll-choice input[type=checkbox] {
+    margin: 9px 17px 0;
+    margin-top: 1px \9;
+    line-height: normal;
+}
 
 .poll-choice-left {
 	margin: 10px 0px 3px 0px;

@@ -262,7 +262,6 @@ class PollNYHooks {
 						if( $poll_info['votes'] > 0 ) {
 							$bar_width = floor( 480 * ( $choice['votes'] / $poll_info['votes'] ) );
 						}
-
 						$output .= "<div class=\"poll-choice\">
 						<div class=\"poll-choice-left\">{$choice['choice']} ({$choice['percent']}%) <span class=\"poll-choice-votes\">" .
 							wfMessage( 'poll-votes', $choice['votes'] )->parse() . PollPage::getFollowingUserPolls($choice['vote_users'])."</span></div>";
@@ -347,6 +346,12 @@ class PollNYHooks {
 	public static function onCanonicalNamespaces( &$list ) {
 		$list[NS_POLL] = 'Poll';
 		$list[NS_POLL_TALK] = 'Poll_talk';
+		return true;
+	}
+	public static function onSkinTemplateToolboxEnd( &$skinTemplate ){
+		$title = SpecialPage::getTitleFor('CreatePoll');
+		$line = Linker::LinkKnown($title, '<i class="icon-pie-chart "></i> 创建投票', array('class'=>'poll-page') );
+		echo Html::rawElement( 'li', array(), $line );
 		return true;
 	}
 }

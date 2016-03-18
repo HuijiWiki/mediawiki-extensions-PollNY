@@ -89,6 +89,7 @@ $wgHooks['RenameUserSQL'][] = 'PollNYHooks::onUserRename'; // For the Renameuser
 $wgHooks['CanonicalNamespaces'][] = 'PollNYHooks::onCanonicalNamespaces';
 $wgHooks['BeforeCreateEchoEvent'][] = 'Poll::onBeforeCreateEchoEvent';
 $wgHooks['EchoGetDefaultNotifiedUsers'][] = 'Poll::onEchoGetDefaultNotifiedUsers';
+$wgHooks['SkinTemplateToolboxEnd'][] = 'PollNYHooks::onSkinTemplateToolboxEnd';
 
 // ResourceLoader support for MediaWiki 1.17+
 $wgResourceModules['ext.pollNY'] = array(
