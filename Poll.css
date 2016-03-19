@@ -1,12 +1,12 @@
 /* CSS for PollNY extension */
-.ns-300 #content h1{
+.ns-300 #firstHeading{
 	display:none;
 }
 #lightbox {
 	padding: 10px;
 	display: none;
 }
-#content p{
+.ns-300 #content p{
     margin-bottom: 0;
 }
 #lightbox img {

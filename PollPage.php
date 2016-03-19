@@ -388,6 +388,9 @@ class PollPage extends Article {
 		global $wgUser;
 		$output = '';
 		$hjUser = HuijiUser::newFromName( $wgUser->getName() );
+		if (!$hjUser->isLoggedIn()){
+			return '';
+		}
 		$following = $hjUser->getFollowingUsers();
 		$f_all_user = array();
 		foreach ($following as $key => $value) {
