@@ -58,20 +58,20 @@ class CreatePoll extends SpecialPage {
 		 */
 		global $wgCreatePollThresholds;
 		if( is_array( $wgCreatePollThresholds ) && count( $wgCreatePollThresholds ) > 0 ) {
-			$canCreate = true;
+			$canCreate = 1;
 
 			$stats = new UserStats( $user->getID(), $user->getName() );
 			$stats_data = $stats->getUserStats();
 
 			$threshold_reason = '';
 			foreach( $wgCreatePollThresholds as $field => $threshold ) {
-				if ( $stats_data[$field] < $threshold ) {
-					$canCreate = false;
-					$threshold_reason .= ( ( $threshold_reason ) ? ', ' : '' ) . "$threshold"."次编辑";
+				if ( (int)$stats_data[$field] < $threshold ) {
+					$canCreate = 2;
+					$threshold_reason = $threshold."次编辑";
 				}
 			}
 			
-			if( $canCreate == false ) {
+			if( $canCreate == 2 ) {
 				$wgSupressPageTitle = false;
 				$out->setPageTitle( $this->msg( 'poll-create-threshold-title' )->plain() );
 				$out->addWikiMsg( 'poll-create-threshold-reason', $threshold_reason );
