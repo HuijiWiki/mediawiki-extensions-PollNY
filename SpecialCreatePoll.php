@@ -65,7 +65,7 @@ class CreatePoll extends SpecialPage {
 
 			$threshold_reason = '';
 			foreach( $wgCreatePollThresholds as $field => $threshold ) {
-				if ( (int)$stats_data[$field] < $threshold ) {
+				if ( (int)str_replace(',','',$stats_data[$field]) < $threshold ) {
 					$canCreate = 2;
 					$threshold_reason = $threshold."次编辑";
 				}
