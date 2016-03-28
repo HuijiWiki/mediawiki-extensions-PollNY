@@ -213,7 +213,7 @@ class PollNYHooks {
 				$p = new Poll();
 				$poll_info = $p->getPoll( $poll_page_id );
 
-				$output = "\t\t" . '<div class="poll-embed-title">' .
+				$output = "\t\t" . '<div><div class="poll-embed-title">投票:' .
 					$poll_info['question'] .
 				'</div>' . "\n";
 
@@ -227,6 +227,7 @@ class PollNYHooks {
 					$poll_info['status'] == 1
 				)
 				{
+					$output .= '<div class="poll-wrap">';
 					if ( !$wgUser->isLoggedIn() ) {
 						$register_title = SpecialPage::getTitleFor( 'Userlogin', 'signup' );
 						$output .= '<div class="c-form-message">' . wfMessage(
@@ -247,7 +248,7 @@ class PollNYHooks {
 
 						$output .= '</form>';
 					}
-					$output .= '</div>';
+					$output .= '</div></div>';
 				} else {
 					// Display message if poll has been closed for voting
 					if( $poll_info['status'] == 0 ) {
@@ -292,6 +293,7 @@ class PollNYHooks {
 						wfMessage( 'poll-createdago', Poll::getTimeAgo( $poll_info['timestamp'] ) )->parse() .
 					'</div></div>';
 				}
+				$output .= '</div>';
 
 				return $output;
 			} else {

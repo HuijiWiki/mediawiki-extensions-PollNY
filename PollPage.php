@@ -175,7 +175,7 @@ class PollPage extends Article {
 		$output .= '</div>' . "\n"; // .poll-right
 		$output .= '<div class="poll">' . "\n";
 
-		$output .= "<h2 class=\"pagetitle\">{$title->getText()}</h2>\n";
+		$output .= "<h2 class=\"pagetitle\">投票:{$title->getText()}</h2>\n";
 
 		// Display question and let user vote
 		if (
