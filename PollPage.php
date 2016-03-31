@@ -132,7 +132,7 @@ class PollPage extends Article {
 			)->parse();
 		} else {
 			$register_title = SpecialPage::getTitleFor( 'Userlogin', 'signup' );
-			$output .= '<div class="c-form-message">' . wfMessage(
+			$output .= '<div class="alert alert-warning" roll="alert">' . wfMessage(
 					'poll-nologin-message',
 					htmlspecialchars( $register_title->getFullURL() )
 				)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
