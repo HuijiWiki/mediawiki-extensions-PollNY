@@ -236,6 +236,7 @@ var PollNY = {
 				data: {
 					action: 'pollny',
 					what: 'vote',
+					pageID: mw.config.get('wgArticleId'),
 					pollID: id,
 					choiceID: choice_id,
 					format: 'json'

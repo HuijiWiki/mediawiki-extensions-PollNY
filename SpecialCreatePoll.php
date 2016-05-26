@@ -140,8 +140,9 @@ class CreatePoll extends SpecialPage {
 			}
 
 			// Clear poll cache
-			$key = wfMemcKey( 'user', 'profile', 'polls', $user->getID() );
-			$wgMemc->delete( $key );
+			// $key = wfMemcKey( 'user', 'profile', 'polls', $user->getID() );
+			// $wgMemc->delete( $key );
+			Poll::clearPollCache( $article->getID(), $user->getID() );
 
 			// Redirect to new poll page
 			$out->redirect( $poll_title->getFullURL() );

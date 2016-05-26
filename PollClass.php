@@ -58,7 +58,7 @@ class Poll {
 	 * @param $pollID Integer: ID number of the poll
 	 * @param $choiceID Integer: number of the choice
 	 */
-	public function addPollVote( $pollID, $choiceID ) {
+	public function addPollVote( $pageId, $pollID, $choiceID ) {
 		global $wgUser;
 		$dbw = wfGetDB( DB_MASTER );
 		$dbw->insert(
@@ -72,6 +72,9 @@ class Poll {
 			),
 			__METHOD__
 		);
+		if ( $pageId != null ) {
+			self::clearPollCache( $pageId, $wgUser->getID() );
+		}
 		if( $choiceID > 0 ) {
 			$this->incPollVoteCount( $pollID );
 			$this->incChoiceVoteCount( $choiceID );
@@ -555,6 +558,14 @@ class Poll {
 	 			break;
 	 	}
 	 	return true;
+	}
+
+	//clear poll cache
+	static function clearPollCache( $pageId, $userId ){
+		$key = wfMemcKey( 'user', 'profile', 'polls', $userId );
+		$jobParams = array( 'key' => $key );
+		$job = new InvalidatePollCacheJob( Title::newFromId($pageId), $jobParams );
+		JobQueueGroup::singleton()->push( $job );
 	}
 
 }

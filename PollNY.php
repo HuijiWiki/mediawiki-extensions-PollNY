@@ -59,6 +59,7 @@ $wgAutoloadClasses['PollPage'] = __DIR__ . '/PollPage.php';
 $wgAutoloadClasses['RandomPoll'] = __DIR__ . '/SpecialRandomPoll.php';
 $wgAutoloadClasses['UpdatePoll'] = __DIR__ . '/SpecialUpdatePoll.php';
 $wgAutoloadClasses['ViewPoll'] = __DIR__ . '/SpecialViewPoll.php';
+$wgAutoloadClasses['InvalidatePollCacheJob'] = __DIR__ . '/Jobs.php';
 
 $wgSpecialPages['AdminPoll'] = 'AdminPoll';
 $wgSpecialPages['CreatePoll'] = 'CreatePoll';
@@ -90,6 +91,10 @@ $wgHooks['CanonicalNamespaces'][] = 'PollNYHooks::onCanonicalNamespaces';
 $wgHooks['BeforeCreateEchoEvent'][] = 'Poll::onBeforeCreateEchoEvent';
 $wgHooks['EchoGetDefaultNotifiedUsers'][] = 'Poll::onEchoGetDefaultNotifiedUsers';
 $wgHooks['SkinTemplateToolboxEnd'][] = 'PollNYHooks::onSkinTemplateToolboxEnd';
+$wgHooks['BeforePageDisplay'][] = 'PollNYHooks::onBeforePageDisplay';
+
+ // The key is your job identifier (from the Job constructor), the value is your class name
+$wgJobClasses['invalidatePollCacheJob'] = 'InvalidatePollCacheJob';
 
 // ResourceLoader support for MediaWiki 1.17+
 $wgResourceModules['ext.pollNY'] = array(

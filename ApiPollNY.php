@@ -58,7 +58,8 @@ class ApiPollNY extends ApiBase {
 			}
 		} elseif ( $action == 'vote' ) {
 			$choiceID = $params['choiceID'];
-			if ( !$choiceID || $choiceID === null || !is_numeric( $choiceID ) ) {
+			$pageId = $params['pageID'];
+			if ( !$choiceID || $choiceID === null || !is_numeric( $choiceID ) || !$pageId || $pageId === null || !is_numeric( $pageId ) ) {
 				$this->dieUsageMsg( 'missingparam' );
 			}
 		}
@@ -84,7 +85,7 @@ class ApiPollNY extends ApiBase {
 				$output = $this->titleExists( $params['pageName'] );
 				break;
 			case 'vote':
-				$output = $this->vote( $pollID, (int) $params['choiceID'] );
+				$output = $this->vote( $pageId, $pollID, (int) $params['choiceID'] );
 				break;
 			default:
 				break;
@@ -208,7 +209,7 @@ class ApiPollNY extends ApiBase {
 		}
 	}
 
-	function vote( $pollID, $choiceID ) {
+	function vote( $pageId, $pollID, $choiceID ) {
 		$user = $this->getUser();
 		if ( !$user->isAllowed( 'pollny-vote' ) ) {
 			return 'error';
@@ -218,7 +219,7 @@ class ApiPollNY extends ApiBase {
 			$user->isAllowed( 'pollny-vote' )
 		)
 		{
-			$this->poll->addPollVote( $pollID, $choiceID );
+			$this->poll->addPollVote( $pageId, $pollID, $choiceID );
 		}
 
 		return 'OK';

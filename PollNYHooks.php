@@ -8,6 +8,11 @@
  */
 class PollNYHooks {
 
+	public static function onBeforePageDisplay( OutputPage &$out, Skin &$skin ) { 
+		// Add required CSS & JS via ResourceLoader
+		$out->addModules( array('ext.pollNY.css', 'ext.pollNY' ));
+	}
+
 	/**
 	 * Updates the poll_question table to point to the new title when a page in
 	 * the NS_POLL namespace is moved.
@@ -58,9 +63,10 @@ class PollNYHooks {
 			);
 			if ( $s !== false ) {
 				// Clear profile cache for user id that created poll
-				global $wgMemc;
-				$key = wfMemcKey( 'user', 'profile', 'polls', $s->poll_user_id );
-				$wgMemc->delete( $key );
+				// global $wgMemc;
+				// $key = wfMemcKey( 'user', 'profile', 'polls', $s->poll_user_id );
+				// $wgMemc->delete( $key );
+				Poll::clearPollCache( $article->getID(), $s->poll_user_id );
 
 				// Delete poll record
 				$dbw->delete(
@@ -112,8 +118,8 @@ class PollNYHooks {
 			global $wgPollScripts, $wgSupressSubTitle, $wgSupressPageCategories;
 
 			// We don't want caching here, it'll only cause problems...
-			$wgOut->enableClientCache( false );
-			$wgHooks['ParserLimitReport'][] = 'PollNYHooks::markUncacheable';
+			// $wgOut->enableClientCache( false );
+			// $wgHooks['ParserLimitReport'][] = 'PollNYHooks::markUncacheable';
 
 			// Prevents editing of polls
 			if( $wgRequest->getVal( 'action' ) == 'edit' ) {
@@ -199,8 +205,8 @@ class PollNYHooks {
 
 			// Disable caching; this is important so that we don't cause subtle
 			// bugs that are a bitch to fix.
-			$wgOut->enableClientCache( false );
-			$parser->disableCache();
+			// $wgOut->enableClientCache( false );
+			// $parser->disableCache();
 
 			$poll_title = Title::newFromText( $poll_name, NS_POLL );
 			$poll_title = PollNYHooks::followPollID( $poll_title );
@@ -236,8 +242,8 @@ class PollNYHooks {
 							)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
 					}else{
 						$wgOut->addModules( 'ext.pollNY' );
-						$output .= "<div id=\"loading-poll_{$poll_info['id']}\" class=\"poll-loading-msg\">" . wfMessage( 'poll-js-loading' )->text() . '</div>';
-						$output .= "<div id=\"poll-display_{$poll_info['id']}\" style=\"display:none;\">";
+						$output .= "<div id=\"loading-poll_{$poll_info['id']}\" class=\"poll-loading-msg\"></div>";
+						$output .= "<div id=\"poll-display_{$poll_info['id']}\" style=\"display;\">";
 						$output .= "<form name=\"poll_{$poll_info['id']}\"><input type=\"hidden\" id=\"poll_id_{$poll_info['id']}\" name=\"poll_id_{$poll_info['id']}\" value=\"{$poll_info['id']}\"/>";
 
 						foreach( $poll_info['choices'] as $choice ) {
