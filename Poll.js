@@ -477,8 +477,10 @@ jQuery( document ).ready( function() {
 	if ( jQuery( '.poll-embed-title' ).length > 0 ) {
 		// This is somewhat of a hack, because I'm lazy
 		var id = jQuery( 'div.poll-loading-msg' ).attr( 'id' );
-		var pollID = id.replace( /loading-poll_/, '' );
-		PollNY.showEmbedPoll( pollID );
+		if (id != undefined){
+			var pollID = id.replace( /loading-poll_/, '' );
+			PollNY.showEmbedPoll( pollID );
+		}
 
 		// Handle clicks on the options
 		jQuery( 'div.poll-choice input[type="radio"]' ).on( 'click', function() {
