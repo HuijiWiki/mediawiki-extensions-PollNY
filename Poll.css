@@ -14,9 +14,6 @@
 	border: none;
 	clear: both;
 }
-body:not(.ns-0) #firstHeading{
-    text-align: center;
-}
 .page-特殊_管理员投票 #mw-content-text{
     background: #f9f9f9;
     padding: 10px 15px;
