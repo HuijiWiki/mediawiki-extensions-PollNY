@@ -107,6 +107,7 @@ class UpdatePoll extends UnlistedSpecialPage {
 		$poll_info = $p->getPoll( $request->getInt( 'id' ) );
 
 		if(
+		    !isset($poll_info['id']) ||
 			!$poll_info['id'] ||
 			!( $user->isAllowed( 'polladmin' ) || $user->getID() == $poll_info['user_id'] )
 		) {
@@ -150,7 +151,7 @@ class UpdatePoll extends UnlistedSpecialPage {
 		$x = 1;
 		foreach( $poll_info['choices'] as $choice ) {
 			$form .= "<div class=\"update-poll-answer\">
-					<span class=\"update-poll-answer-number\">{$x}.</span>
+					<span class=\"update-poll-answer-number secondary\">{$x}.</span>
 					<input type=\"text\" tabindex=\"{$x}\" id=\"poll_answer_{$x}\" name=\"poll_answer_{$x}\" value=\"" .
 						htmlspecialchars( $choice['choice'], ENT_QUOTES ) . '" />
 				</div>';

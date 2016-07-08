@@ -472,6 +472,39 @@ jQuery( document ).ready( function() {
 			PollNY.goToNewPoll();
 		} );
 	}
+	$('.pollembed-wrap').each(function(){
+		//request poll
+		$this = $(this);
+		var api = new mw.Api();
+		api.get({
+			action : "pollny",
+			what : "render",
+			pollID : $this.data('poll-id'),
+			pollName : $this.data('poll-name')
+		}).done(function(data){
+			$this.append(data.pollny.result);
+				// Polls embedded via the <pollembed> tag
+			if ( jQuery( '.poll-embed-title' ).length > 0 ) {
+				// This is somewhat of a hack, because I'm lazy
+				var id = jQuery( 'div.poll-loading-msg' ).attr( 'id' );
+				if (id != undefined){
+					var pollID = id.replace( /loading-poll_/, '' );
+					PollNY.showEmbedPoll( pollID );
+				}
+
+				// Handle clicks on the options
+				jQuery( 'div.poll-choice input[type="radio"]' ).on( 'click', function() {
+					PollNY.pollEmbedVote(
+						jQuery( this ).data( 'poll-id' ),
+						jQuery( this ).data( 'poll-page-id' )
+					);
+				} );
+			}
+		});	
+
+	});
+
+	
 
 	// Polls embedded via the <pollembed> tag
 	if ( jQuery( '.poll-embed-title' ).length > 0 ) {

@@ -173,7 +173,7 @@ class AdminPoll extends SpecialPage {
 			}
 
 			$poll_url = htmlspecialchars( $title->getFullURL() );
-			$output .= "<div class=\"view-poll-number\">{$x}.</div>
+			$output .= "<div class=\"view-poll-number secondary\">{$x}.</div>
 					<div class=\"view-poll-user-image\"><img src=\"{$wgUploadPath}/avatars/{$avatar->getAvatarImage()}\" alt=\"\" /></div>
 					<div class=\"view-poll-user-name\">{$user_create}</div>
 					<div class=\"view-poll-text\">

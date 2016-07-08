@@ -100,7 +100,7 @@ class PollPage extends Article {
 		// 	<img src=\"{$imgPath}/commentsIcon.gif\" alt=\"\" />
 		// 	{$formattedCommentCount}
 		// </li>
-		$output .= '<div class="credit-box">
+		$output .= '<div class="credit-box darken">
 					<h3>' . wfMessage( 'poll-submitted-by' )->text() . "</h3>
 					<div class=\"submitted-by-image\">
 						".$mAvatarAnchor."
@@ -206,7 +206,7 @@ class PollPage extends Article {
 			}
 			$output .= '</div>' . "\n";
 
-			$output .= '<div class="poll-timestamp">' .
+			$output .= '<div class="poll-timestamp secondary">' .
 					wfMessage( 'poll-createdago', Poll::getTimeAgo( $poll_info['timestamp'] ) )->text() .
 				'</div>' . "\n";
 
@@ -250,7 +250,7 @@ class PollPage extends Article {
 
 					$output .= "<span class=\"poll-choice-votes\">" .
 							wfMessage( 'poll-votes', $choice['votes'] )->parse() .
-						"</span><div class=\"poll-choice-right\" style=\"width:{$percent}%\"> </div>";
+						"</span><div class=\"poll-choice-right primary\" style=\"width:{$percent}%\"> </div>";
 
 					$output .= '</div>';
 
@@ -336,7 +336,7 @@ class PollPage extends Article {
 					// }
 					
 					// $output .="<span class=\"poll-user\">(who也投了此选项)</span>";
-					$output .= "<div class=\"poll-choice-right\" style=\"width:{$percent}%\"> </div></div>";
+					$output .= "<div class=\"poll-choice-right primary\" style=\"width:{$percent}%\"> </div></div>";
 
 					$x++;
 				}
@@ -367,7 +367,7 @@ class PollPage extends Article {
 					</td>
 					<td>
 						<form name=\"embed_poll\">
-							<input name='embed_code' style='width:300px;font-size:10px;' type='text' value='<pollembed title=\"{$poll_embed_name}\" />' onclick='javascript:document.embed_poll.embed_code.focus();document.embed_poll.embed_code.select();' readonly='readonly' />
+							<input name='embed_code' style='width:300px;font-size:10px;' type='text' value='<pollembed id=\"{$poll_info['id']}\" title=\"{$poll_embed_name}\" />' onclick='javascript:document.embed_poll.embed_code.focus();document.embed_poll.embed_code.select();' readonly='readonly' />
 						</form>
 					</td>
 				</tr>

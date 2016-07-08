@@ -193,123 +193,13 @@ class PollNYHooks {
 	 * @return HTML or nothing
 	 */
 	public static function renderEmbedPoll( $input, $args, $parser ) {
+		$poll_id = $args['id'];
 		$poll_name = $args['title'];
-		if( $poll_name ) {
-			global $wgOut, $wgUser, $wgExtensionAssetsPath, $wgPollDisplay;
-
-			// Load CSS for non-Monaco skins - Monaco's ny.css already contains
-			// PollNY's styles (and more)
-			if ( get_class( $wgOut->getSkin() ) !== 'SkinMonaco' ) {
-				$wgOut->addModuleStyles( 'ext.pollNY.css' );
-			}
-
-			// Disable caching; this is important so that we don't cause subtle
-			// bugs that are a bitch to fix.
-			// $wgOut->enableClientCache( false );
-			// $parser->disableCache();
-
-			$poll_title = Title::newFromText( $poll_name, NS_POLL );
-			$poll_title = PollNYHooks::followPollID( $poll_title );
-			$poll_page_id = $poll_title->getArticleID();
-			// if ( $wgUser->getID() == 0 ) {
-			// 	$output = '<h1>no login</h1>';
-			// 	return $output;
-			// }
-			if( $poll_page_id > 0 ) {
-				$p = new Poll();
-				$poll_info = $p->getPoll( $poll_page_id );
-
-				$output = "\t\t" . '<div><div class="poll-embed-title">投票:' .
-					$poll_info['question'] .
-				'</div>' . "\n";
-
-
-				// If the user hasn't voted for this poll yet, they're allowed
-				// to do so and the poll is open for votes, display the question
-				// and let the user vote
-				if (
-					$wgUser->isAllowed( 'pollny-vote' ) &&
-					!$p->userVoted( $wgUser->getName(), $poll_info['id'] ) &&
-					$poll_info['status'] == 1
-				)
-				{
-					$output .= '<div class="poll-wrap">';
-					if ( !$wgUser->isLoggedIn() ) {
-						$register_title = SpecialPage::getTitleFor( 'Userlogin', 'signup' );
-						$output .= '<div class="c-form-message">' . wfMessage(
-								'poll-nologin-message',
-								htmlspecialchars( $register_title->getFullURL() )
-							)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
-					}else{
-						$wgOut->addModules( 'ext.pollNY' );
-						$output .= "<div id=\"loading-poll_{$poll_info['id']}\" class=\"poll-loading-msg\"></div>";
-						$output .= "<div id=\"poll-display_{$poll_info['id']}\" style=\"display;\">";
-						$output .= "<form name=\"poll_{$poll_info['id']}\"><input type=\"hidden\" id=\"poll_id_{$poll_info['id']}\" name=\"poll_id_{$poll_info['id']}\" value=\"{$poll_info['id']}\"/>";
-
-						foreach( $poll_info['choices'] as $choice ) {
-							$output .= "<div class=\"poll-choice\">
-							<input type=\"radio\" name=\"poll_choice\" data-poll-id=\"{$poll_info['id']}\" data-poll-page-id=\"{$poll_page_id}\" id=\"poll_choice\" value=\"{$choice['id']}\">{$choice['choice']}
-							</div>";
-						}
-
-						$output .= '</form>';
-					}
-					$output .= '</div></div>';
-				} else {
-					// Display message if poll has been closed for voting
-					if( $poll_info['status'] == 0 ) {
-						$output .= '<div class="poll-closed">' .
-							wfMessage( 'poll-closed' )->text() . '</div>';
-					}
-
-					$x = 1;
-					$output .= '<div class="poll-wrap">';
-					foreach( $poll_info['choices'] as $choice ) {
-						//$percent = round( $choice['votes'] / $poll_info['votes'] * 100 );
-						if( $poll_info['votes'] > 0 ) {
-							$bar_width = floor( 480 * ( $choice['votes'] / $poll_info['votes'] ) );
-						}
-						$output .= "<div class=\"poll-choice\">
-						<div class=\"poll-choice-left\">{$choice['choice']} ({$choice['percent']}%) <span class=\"poll-choice-votes\">" .
-							wfMessage( 'poll-votes', $choice['votes'] )->parse() . PollPage::getFollowingUserPolls($choice['vote_users'])."</span></div>";
-
-						// If the amount of votes is not set, set it to 0
-						// This fixes an odd bug where "votes" would be shown
-						// instead of "0 votes" when using the pollembed tag.
-						if ( empty( $choice['votes'] ) ) {
-							$choice['votes'] = 0;
-						}
-
-						$output .= "<div class=\"poll-choice-right\" style=\"width:{$choice['percent']}%\"></div>";
-						$output .= '</div>';
-
-						$x++;
-					}
-
-					$output .= '<div class="poll-total-votes">(' .
-						wfMessage(
-							'poll-based-on-votes',
-							$poll_info['votes']
-						)->parse() . ')</div>';
-					if ( isset( $wgPollDisplay['comments'] ) && $wgPollDisplay['comments'] ) {
-						$output .= '<div><a href="' . htmlspecialchars( $poll_title->getFullURL() ) . '">' .
-							wfMessage( 'poll-discuss' )->text() . '</a></div>';
-					}
-					$output .= '<div class="poll-timestamp">' .
-						wfMessage( 'poll-createdago', Poll::getTimeAgo( $poll_info['timestamp'] ) )->parse() .
-					'</div></div>';
-				}
-				$output .= '</div>';
-
-				return $output;
-			} else {
-				// Poll doesn't exist or is unavailable for some other reason
-				$output = '<div class="poll-embed-title">' .
-					wfMessage( 'poll-unavailable' )->text() . '</div>';
-				return $output;
-			}
+		$class = $args['class'];
+		if ($poll_id){
+			$output = "<div class='pollembed-wrap {$class}' data-poll-id='".$poll_id."' data-poll-name='".$poll_name."'></div>";
+			return $output;
 		}
-
 		return '';
 	}
 

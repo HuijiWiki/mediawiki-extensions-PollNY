@@ -160,7 +160,7 @@ class ViewPoll extends SpecialPage {
 				$output .= "<div class=\"view-poll-row-bottom\" id=\"{$row_id}\" onclick=\"window.location='{$url}'\">";
 			}
 
-			$output .= "<div class=\"view-poll-number\">{$x}.</div>
+			$output .= "<div class=\"view-poll-number secondary\">{$x}.</div>
 					<div class=\"view-poll-user-image\">
 						{$avatar->getAvatarURL()}
 					</div>

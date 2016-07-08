@@ -92,6 +92,7 @@
 	"poll-time-minutes": "$1分钟",
 	"poll-time-seconds": "$1秒",
 	"poll-user":"$1支持该选项",
+	"poll-embed-title-prefix":"投票：",
 	"specialpages-group-poll": "投票",
 	"action-pollny-vote": "进行中的投票",
 	"right-pollny-vote": "进行中的投票",

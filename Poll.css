@@ -15,7 +15,6 @@
 	clear: both;
 }
 .page-特殊_管理员投票 #mw-content-text{
-    background: #f9f9f9;
     padding: 10px 15px;
 }
 #lightboxText {
@@ -49,7 +48,8 @@
 
 /* Create Form */
 .create-poll-top {
-    border: 1px dashed #999;
+    border-width: 1px;
+    border-style: dashed;
     margin: 0px 0px 25px;
     padding: 9px;
     width: 500px;
@@ -58,8 +58,6 @@
     border-radius: 1px;
 }
 .create-poll-top .site-button{
-    background: #428BCA;
-    color: #fff;
     margin-top: 20px;
 }
 .create-poll-top h4{
@@ -67,7 +65,6 @@
 }
 .create-poll-top h1 {
 	font-size: 22px;
-	font-color: #333333;
 	border-bottom: none;
 	margin: 0px 0px 10px 0px !important;
 }
@@ -77,7 +74,6 @@
 
 .create-poll-question-and-answer h1, .create-poll-image h1 {
 	font-size: 16px;
-	font-color: #333333;
 	border-bottom: none;
 	font-weight: bold;
 	margin: 20px 0px 10px 0px !important;
@@ -102,12 +98,12 @@
 /* Poll Window */
 .previous-poll {
 	margin: 20px 0px 0px 0px;
-	border-top: 1px solid #DCDCDC;
+	border-top-width: 1px;
+    border-top-style: solid;
 	padding: 15px 0px 0px 0px;
 }
 
 .previous-poll-title {
-	color: #333333;
 	font-size: 16px;
 	font-weight: bold;
 	margin: 0px 0px 2px 0px;
@@ -137,7 +133,6 @@
 }
 
 .previous-poll-choice-votes {
-	color: #000000 !important;
 	font-size: 11px !important;
 	font-weight: normal !important;
 	margin: 0px 0px 0px 3px;
@@ -153,16 +148,13 @@
 }
 
 .credit-box {
-	border: 1px solid #DCDCDC;
 	padding: 10px;
 	padding-bottom: 40px;
-	background-color: #F2F4F7;
 	margin: 8px 0px 0px 0px;
 }
 
 .credit-box h1 {
 	font-size: 14px;
-	color: #333333;
 	border-bottom: none;
 	font-weight: bold;
 	margin: 0px !important;
@@ -207,9 +199,11 @@
 .poll-choice-votes {
 	font-size: 15px;
     display: inline-block;
-    color:rgb(121, 121, 121);
     padding-left: 5px;
+    position: absolute;
+    bottom: 0;
 }
+
 .poll-total-votes {
     text-align: center;
     margin-top: 20px;
@@ -220,7 +214,8 @@
 }
 
 .submitted-by-image img {
-	border: 1px solid #DCDCDC;
+	border-width: 1px;
+    border-style: solid;
 }
 
 .submitted-by-user {
@@ -237,7 +232,6 @@
 	float: left;
 	margin: 0px 6px 0px 0px;
 	font-size: 12px;
-	color: #333333;
 	font-weight: bold;
 }
 
@@ -258,12 +252,15 @@
 .poll-wrap{
     max-width: 600px;
     padding: 10px 5px;
-    border: 1px dashed #999;
+    border-width: 1px;
+    border-style: dashed;
+    margin: 1em 0em;
 }
 .poll-choice {
 	font-size: 16px;
 	font-weight: bold;
 	margin: 0px 0px 6px 0px;
+    position: relative;
 }
 .poll-choice input[type=radio], .poll-choice input[type=checkbox] {
     margin: 9px 17px 0;
@@ -395,7 +392,6 @@
 	font-size: 16px;
 	font-weight: bold;
 	border-bottom: none;
-	color: #333333;
 	margin: 0px 0px 10px 0px !important;
 }
 
@@ -407,7 +403,6 @@
 	font-size: 16px;
 	font-weight: bold;
 	margin: 0px 5px 0px 0px;
-	color: #CCCCCC;
 }
 
 .update-poll-answer input {
@@ -430,7 +425,8 @@
 
 .edit-button-poll {
 	background-color: #FFFCA9;
-	border: 1px solid #FDC745;
+	border-width: 1px;
+    border-style: solid;
 	padding: 5px 0px 5px 5px;
 	width: 90px;
 }
@@ -441,7 +437,8 @@
 
 .edit-sub-menu-poll {
 	background-color: #FFFFFF;
-	border: 1px solid #FDC745;
+	border-width: 1px;
+    border-style: solid;
 	left: -40px;
 	padding: 5px 5px 10px;
 	position: absolute;
@@ -478,8 +475,8 @@
 
 .view-poll-navigation h2 {
 	font-size: 16px;
-	color: #333333;
-	border-bottom: 1px solid #DCDCDC;
+	border-bottom-width: 1px;
+    border-bottom-style: solid;
 	padding: 0px 0px 3px 0px;
 	margin: 0px 0px 10px 0px !important;
 }
@@ -494,7 +491,6 @@
 }
 
 .view-poll-top-links a {
-	color: #002BB8;
 	font-weight: bold;
 	text-decoration:none;
 }
@@ -504,7 +500,8 @@
 }
 
 .view-poll-row {
-	border-bottom: 1px solid #DCDCDC;
+	border-bottom-width: 1px;
+    border-bottom-style: solid;
 	/*height: 60px;*/
 	padding: 15px 0px 15px 5px;
 	width: 600px;
@@ -519,7 +516,6 @@
 }
 
 .view-poll-number {
-	color: #DCDCDC;
 	font-size: 18px;
 	font-weight: bold;
 	float: left;
@@ -535,7 +531,6 @@
 	float: left;
 	width: 70px;
 	font-size: 14px;
-	color: #002BB8;
 	font-weight: bold;
 	margin-right: 10px;
 	/*margin: 0px 65px 0px 0px;*/
@@ -544,19 +539,17 @@
 .view-poll-text {
 	float: left;
 	font-size: 16px;
-	color: #002BB8;
+	/*color: #002BB8;*/
 	font-weight: bold;
 	width: 365px;
 }
 
 .view-poll-num-answers {
 	font-size: 13px !important;
-	color: #797979 !important;
 }
 
 .view-poll-time {
 	font-size: 11px !important;
-	color: #797979 !important;
 	font-weight: normal !important;
 }
 
@@ -565,7 +558,8 @@
 }
 
 .view-poll-user-image img {
-	border: 1px solid #DCDCDC;
+	border-width: 1px;
+    border-style: solid;
 }
 
 .view-poll-page-nav {
@@ -577,11 +571,6 @@
 }
 
 /* Hover effect when moving the mouse over a poll row on Special:ViewPoll; used to be done w/ JS */
-.mw-special-ViewPoll div.view-poll-row:hover,
-.mw-special-ViewPoll div.view-poll-row-bottom:hover {
-	background-color: #FFFCA9;
-}
-
 .poll-unit-title {
 	font-size: 12px;
 	line-height: 13px;
@@ -604,7 +593,8 @@
 .poll-unit-image img {
 	padding: 3px;
 	background-color: #FFF;
-	border: 1px solid #DCDCDC;
+	border-width: 1px;
+    border-style: solid;
 }
 
 .poll-unit-choices input {
@@ -613,7 +603,6 @@
 
 .poll-timestamp {
 	font-size: 12px;
-	color: #666666;
 	text-align: center;
 }
 
@@ -635,7 +624,6 @@
 	height: 20px;
 	font-weight: bold;
 	letter-spacing: 0px;
-	background: #428BCA;
 	margin-bottom: 5px; 
 	padding: 1px;
 	font-size: 16px;
