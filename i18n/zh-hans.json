@@ -116,5 +116,8 @@
 	"notification-poll":"您发起的投票有新的用户参与了$1",
 	"notification-poll-check":"查看",
 	"echo-category-title-poll-msg":"投票",
-	"echo-pref-tooltip-poll-msg":"当有人参与我发起的投票时通知我"
+	"echo-pref-tooltip-poll-msg":"当有人参与我发起的投票时通知我",
+	"notification-bundle-header-poll-msg":"您有$1条投票消息。",
+	"notification-header-poll-msg":"$1参与了您的投票。",
+	"notification-view-poll":"查看投票"
 }

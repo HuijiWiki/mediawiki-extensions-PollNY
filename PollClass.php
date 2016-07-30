@@ -517,21 +517,14 @@ class Poll {
             'tooltip' => 'echo-pref-tooltip-poll-msg',
         );
         $notifications['poll-msg'] = array(
-            'category' => 'poll-msg',
-            'group' => 'positive',
-            'formatter-class' => 'EchoPollFormatter',
-            'title-message' => 'notification-poll',
-            'title-params' => array( 'agent', 'reply', 'detail' ),
-            'flyout-message' => 'notification-poll-flyout',
-            'flyout-params' => array( 'agent', 'reply', 'detail' ),
-            'payload' => array( 'summary' ),
-            'email-subject-message' => 'notification-poll-email-subject',
-            'email-subject-params' => array( 'agent' ),
-            'email-body-message' => 'notification-poll-email-body',
-            'email-body-params' => array( 'agent', 'main-title-text', 'email-footer' ),
-            'email-body-batch-message' => 'notification-poll-email-batch-body',
-            'email-body-batch-params' => array( 'agent', 'main-title-text' ),
-            'icon' => 'chat',
+        	'category' => 'poll-msg',
+        	'group' => 'positive',
+        	'section' => 'alert',
+        	'presentation-model' => 'EchoPollPresentationModel',
+        	'bundle' => [
+        		'web' => true,
+        		'expandable' => true,
+        	]
         );
         return true;
     }
@@ -569,46 +562,45 @@ class Poll {
 	}
 
 }
-class EchoPollFormatter extends EchoBasicFormatter {
-
-	protected function formatPayload( $payload, $event, $user ) {
-		switch ( $payload ) {
-		   	case 'summary': 
-				$eventData = $event->getExtra();
-	        	if ( !isset( $eventData['poll-content']) ) {
-	                return;
-	            }
-			    return $eventData['poll-content'];
-		        break;
-		   	default:
-		        return parent::formatPayload( $payload, $event, $user );
-		        break;
+class EchoPollPresentationModel extends EchoEventPresentationModel {
+	public function canRender() {
+		return (bool)$this->event->getTitle();
+	}
+	public function getIconType() {
+		return 'thank';
+	}
+	public function getHeaderMessage() {
+		if ( $this->isBundled() ) {
+			$msg = $this->msg( 'notification-bundle-header-poll-msg' );
+			$msg->params( $this->getBundleCount() );
+			return $msg;
+		}
+		$msg = parent::getHeaderMessage();
+		return $msg;
+	}
+	public function getBodyMessage() {
+		$excerpt = $this->event->getExtraParam( 'poll-content' );
+		if ( $excerpt ) {
+			$msg = new RawMessage( '$1' );
+			$msg->plaintextParams( $excerpt );
+			return $msg;
 		}
 	}
-		
-    
-
-   /**
-     * @param $event EchoEvent
-     * @param $param
-     * @param $message Message
-     * @param $user User
-     */
-    protected function processParam( $event,$params, $message, $user ) {
-    	$eventData = $event->getExtra();
-    	$titleData = $event->getTitle()->getPrefixedText();
-    	if ( !isset( $eventData['poll-id']) ) {
-            $eventData['poll-id'] = null;
-        }
-        $this->setTitleLink(
-            $event,
-            $message,
-            array(
-                'class' => 'mw-echo-poll-msg',
-              	'linkText' => wfMessage('notification-poll-check')->text(),
-            )
-        );                    	
-
-    }
-
+	public function getPrimaryLink() {
+		$title = $this->event->getTitle();
+		// Make a link to #flow-post-{postid}
+		$title = Title::makeTitle(
+			$title->getNamespace(),
+			$title->getDBKey(),
+			'',
+			''
+		);
+		return [
+			'url' => $title->getFullURL(),
+			'label' => $this->msg( 'notification-view-poll' )->text(),
+		];
+	}
+	public function getSecondaryLinks() {
+		return [ $this->getAgentLink() ];
+	}
 }
