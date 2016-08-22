@@ -301,7 +301,7 @@ class ApiPollNY extends ApiBase {
 					$output .= '<div class="c-form-message">' . wfMessage(
 							'poll-nologin-message',
 							htmlspecialchars( $register_title->getFullURL() )
-						)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
+						)->text() . '<a href="/wiki/Special:UserLogin">登录</a>。</div>' . "\n";
 				}else{
 					$wgOut->addModules( 'ext.pollNY' );
 					$output .= "<div id=\"loading-poll_{$poll_info['id']}\" class=\"poll-loading-msg\"></div>";
