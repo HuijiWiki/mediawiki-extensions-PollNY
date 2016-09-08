@@ -567,7 +567,7 @@ class EchoPollPresentationModel extends EchoEventPresentationModel {
 		return (bool)$this->event->getTitle();
 	}
 	public function getIconType() {
-		return 'thank';
+		return 'chat';
 	}
 	public function getHeaderMessage() {
 		if ( $this->isBundled() ) {
