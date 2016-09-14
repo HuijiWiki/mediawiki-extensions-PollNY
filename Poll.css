@@ -460,9 +460,10 @@
 .view-poll-user-name {
 	float: left;
 	width: 70px;
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: bold;
 	margin-right: 10px;
+	line-height: 1.8em;
 	/*margin: 0px 65px 0px 0px;*/
 }
 
@@ -585,7 +586,7 @@
 .originalwork-notice {
 	font-size: 0.8em;
 }
-.author-container, .more-container, .originalwork-notice{
+.author-container, .more-container, .link-container{
 	margin-top: 40px;
 	padding: 20px;
 }
@@ -600,3 +601,18 @@
 .author-item-small{
 	font-size: 0.6em;
 }
+.mw-special-ViewPoll #mw-content-text .dropdown,.mw-special-ViewPoll .view-poll{
+	width: 100%;
+}
+.view-poll-row, .view-poll-row-bottom, .mw-special-ViewPoll #mw-content-text .dropdown button
+{
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+}
+.mw-special-ViewPoll #mw-content-text .dropdown.open ul{
+	display: block;
+	right: 35%;
+	left: 35%;
+}
+

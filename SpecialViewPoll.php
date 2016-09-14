@@ -53,19 +53,12 @@ class ViewPoll extends SpecialPage {
 		if ( $limit > 0 && $page ) {
 			$limitvalue = $page * $limit - ( $limit );
 		}
-
 		// Safelinks
-		$random_poll_link = SpecialPage::getTitleFor( 'RandomPoll' );
+		// $random_poll_link = SpecialPage::getTitleFor( 'RandomPoll' );
 
-		$output = '
-		<div class="view-poll-top-links">
-			<a href="' . htmlspecialchars( $random_poll_link->getFullURL() ) . '">' .
-				$this->msg( 'poll-take-button' )->text() .
-			'</a>
-		</div>
-
-		<div class="view-poll-navigation">
-			<h2>' . $this->msg( 'poll-view-order' )->text() . '</h2>';
+		// $output = '
+		// <div class="view-poll-navigation">
+		// 	<h2>' . $this->msg( 'poll-view-order' )->text() . '</h2>';
 
 		$dbr = wfGetDB( DB_SLAVE );
 		$where = array();
@@ -76,26 +69,23 @@ class ViewPoll extends SpecialPage {
 			$where['poll_user_name'] = $user;
 			$userLink['user'] = $user;
 		}
+		$templateParser = new TemplateParser(  __DIR__  );
+
 
 		if ( $type == 'newest' ) {
-			$output .= '<p>' . Linker::link(
-				$thisTitle,
-				$this->msg( 'poll-view-popular' )->text(),
-				array(),
-				array( 'type' => 'most' ) + $userLink
-			) . '</p><p><b>' .
-				$this->msg( 'poll-view-newest' )->text() . '</b></p>';
+			$active = $this->msg( 'poll-view-newest' )->text();
 		} else {
-			$output .= '<p><b>' . $this->msg( 'poll-view-popular' )->text() .
-				'</b></p><p>' . Linker::link(
-					$thisTitle,
-					$this->msg( 'poll-view-newest' )->text(),
-					array(),
-					array( 'type' => 'newest' ) + $userLink
-				) . '</p>';
+			$active = $this->msg( 'poll-view-popular' )->text();
 		}
+		$output = $templateParser->processTemplate(
+			'dropdown',
+			array(
+				'active' => $active,
+				'user' => $user
+			)
+		);
 
-		$output .= '</div>';
+		// $output .= '</div>';
 
 		if ( isset( $user ) ) {
 			$out->setPageTitle( $this->msg( 'poll-view-title', $user )->parse() );

@@ -154,7 +154,7 @@ class PollPage extends Article {
 			$toggle_status = ( ( $poll_info['status'] == 1 ) ? 0 : 1 );
 		}
 
-		$output .= '<div class="well poll-links">' . "\n";
+		$output .= '<div class="well link-container">' . "\n";
 		// "Embed this on a wiki page" feature
 		
 		$output .= '<b>' . wfMessage( 'poll-embed' )->plain() . "</b>
@@ -183,9 +183,16 @@ class PollPage extends Article {
 		}
 
 		$output .= "\n" . '</div>' . "\n"; // .poll-links
-		$output .= "<div class=well more-by-this-author>"."<a href=\"" 
+		// Safelinks
+		$random_poll_link = SpecialPage::getTitleFor( 'RandomPoll' );
+		$output .= "
+		<div class=\"well more-container\">"."<ul><li><a href=\"" 
 			. htmlspecialchars( SpecialPage::getTitleFor( 'ViewPoll' )->getFullURL( 'user=' . $poll_info['user_name'] ) ) . '">'
-			. wfMessage( 'poll-view-all-by', $user_name_short, $poll_info['user_name'] )->parse() . '</a>'."</div>";
+			. wfMessage( 'poll-view-all-by', $user_name_short, $poll_info['user_name'] )->parse() . '</a></li><li>'.'
+			<a href="' . htmlspecialchars( $random_poll_link->getFullURL() ) . '">' .
+				wfmessage( 'poll-take-button' )->text() .
+			'</a></li></ul>
+		</div>';
 
 		// $output .= $this->getOtherPolls();
 

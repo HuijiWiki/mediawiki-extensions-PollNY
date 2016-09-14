@@ -79,7 +79,7 @@
 	"poll-view-title": "查看$1发起的投票",
 	"poll-view-order": "排序",
 	"poll-view-newest": "最新投票",
-	"poll-view-popular": "最受欢迎的投票",
+	"poll-view-popular": "热门投票",
 	"poll-view-answered-times": "共$1人参与",
 	"poll-view-all-by": "查看所有由$1发起的投票",
 	"poll-voted-for": "您已参与了$1项投票，共有<b>$2</b>项。累积获得里程数<span class=\"profile-on\"><b>$3</b></span>。",
