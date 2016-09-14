@@ -188,7 +188,7 @@ var PollNY = {
 				data: {
 					action: 'pollny',
 					what: 'updateStatus',
-					pollID: document.getElementById( 'poll_id' ).value,
+					pollID: $( '.pollembed-wrap' ).data('poll-id'),
 					status: status,
 					format: 'json'
 				}

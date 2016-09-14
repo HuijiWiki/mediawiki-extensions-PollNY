@@ -195,9 +195,8 @@ class PollNYHooks {
 	public static function renderEmbedPoll( $input, $args, $parser ) {
 		$poll_id = $args['id'];
 		$poll_name = $args['title'];
-		$class = $args['class'];
 		if ($poll_id){
-			$output = "<div class='pollembed-wrap {$class}' data-poll-id='".$poll_id."' data-poll-name='".$poll_name."'></div>";
+			$output = "<div class='pollembed-wrap' data-poll-id='".$poll_id."' data-poll-name='".$poll_name."'></div>";
 			return $output;
 		}
 		return '';

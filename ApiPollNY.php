@@ -50,7 +50,7 @@ class ApiPollNY extends ApiBase {
 		} elseif ( $action == 'updateStatus' ) {
 			$status = $params['status'];
 			if ( $status === null || !is_numeric( $status ) ) {
-				$this->dieUsageMsg( 'missingparam' );
+				$this->dieUsageMsg( 'missingparam' , 'status');
 			}
 		} elseif ( $action == 'titleExists' ) {
 			if ( !$params['pageName'] || $params['pageName'] === null ) {
@@ -322,8 +322,13 @@ class ApiPollNY extends ApiBase {
 				if( $poll_info['status'] == 0 ) {
 					$output .= '<div class="poll-closed">' .
 						wfMessage( 'poll-closed' )->text() . '</div>';
+					// $status = wfMessage('poll-admin-closed')->text();
 				}
-
+				if( $poll_info['status'] == 2 ) {
+					$output .= '<div class="poll-flagged">' .
+						wfMessage( 'poll-flagged' )->text() . '</div>';
+					// $status = wfMessage('poll-admin-closed')->text();
+				}
 				$x = 1;
 				$output .= '<div class="poll-wrap">';
 				foreach( $poll_info['choices'] as $choice ) {
@@ -332,8 +337,8 @@ class ApiPollNY extends ApiBase {
 						$bar_width = floor( 480 * ( $choice['votes'] / $poll_info['votes'] ) );
 					}
 					$output .= "<div class=\"poll-choice\">
-					<div class=\"poll-choice-left\">{$choice['choice']} ({$choice['percent']}%) <span class=\"poll-choice-votes\">" .
-						wfMessage( 'poll-votes', $choice['votes'] )->parse() . PollPage::getFollowingUserPolls($choice['vote_users'])."</span></div>";
+					<div class=\"poll-choice-left\">{$choice['choice']} ({$choice['percent']}%)" .
+						 PollPage::getFollowingUserPolls($choice['vote_users'])."</div>";
 
 					// If the amount of votes is not set, set it to 0
 					// This fixes an odd bug where "votes" would be shown
@@ -341,9 +346,26 @@ class ApiPollNY extends ApiBase {
 					if ( empty( $choice['votes'] ) ) {
 						$choice['votes'] = 0;
 					}
-
-					$output .= "<div class=\"poll-choice-right primary\" style=\"width:{$choice['percent']}%\"></div>";
-					$output .= '</div>';
+					switch ($x % 5) {
+						case 1:
+							$colorscheme = 'progress-bar-primary';
+							break;
+						case 2:
+							$colorscheme = 'progress-bar-info';
+							break;
+						case 3:
+							$colorscheme = 'progress-bar-warning';
+							break;
+						case 4:
+						    $colorscheme = 'progress-bar-success';
+						    break;
+						default:
+							$colorscheme = 'progress-bar-danger';
+							break;
+					}
+					$output .= "<div class=\"progress\"><div class=\"poll-choice-right progress-bar
+					{$colorscheme}\" style=\"min-width: 2em; width:{$choice['percent']}%\">".wfMessage( 'poll-votes', $choice['votes'] )->parse() ."</div>";
+					$output .= '</div></div>';
 
 					$x++;
 				}

@@ -70,24 +70,37 @@ class PollPage extends Article {
 		$avatar = new wAvatar( $poll_info['user_id'], 'ml' );
 		// $avatarID = $avatar->getAvatarImage();
 		$mAvatarAnchor = $avatar->getAvatarAnchor();
-		$stats = new UserStats( $poll_info['user_id'], $poll_info['user_name'] );
-		$stats_data = $stats->getUserStats();
+		// $stats = new UserStats( $poll_info['user_id'], $poll_info['user_name'] );
+		// $stats_data = $stats->getUserStats();
 		$user_name_short = $lang->truncate( $poll_info['user_name'], 27 );
 
-		$output = '<div class="poll-right">';
-		// Show the "create a poll" link to registered users
-		if( $wgUser->isLoggedIn() ) {
-			$output .= '<div class="create-link">
-				<a href="' . htmlspecialchars( $createPollObj->getFullURL() ) . '">
-					<img src="' . $imgPath . '/addIcon.gif" alt="" />'
-					. wfMessage( 'poll-create' )->text() .
-				'</a>
-			</div>';
-		}
+		$profile = new UserProfile( $poll_info['user_name'] );
+		$profileData = $profile->getProfile();
 
-		$formattedVoteCount = $lang->formatNum( $stats_data['poll_votes'] );
-		$formattedEditCount = $lang->formatNum( $stats_data['edits'] );
-		$formattedCommentCount = $lang->formatNum( $stats_data['comments'] );
+		$poll_embed_name = htmlspecialchars( $title->getText(), ENT_QUOTES );
+		$poll_embed_link = "<pollembed id=\"{$poll_info['id']}\" title=\"{$poll_embed_name}\" />";
+
+		$output = '<div class="row">';
+
+		$output .= '<div class="col-md-8">';
+
+		$output .= $this->getContext()->getOutput()->parse($poll_embed_link);
+
+		$output .= '</div>';
+
+		$output .= '<div class="col-md-4">';
+		// Show the "create a poll" link to registered users
+		// if( $wgUser->isLoggedIn() ) {
+		// 	$output .= '<div class="create-link">
+		// 		<a href="' . htmlspecialchars( $createPollObj->getFullURL() ) . '">
+		// 			<img src="' . $imgPath . '/addIcon.gif" alt="" />'
+		// 			. wfMessage( 'poll-create' )->text() .
+		// 		'</a>
+		// 	</div>';
+		// }
+		// $formattedVoteCount = $lang->formatNum( $stats_data['poll_votes'] );
+		// $formattedEditCount = $lang->formatNum( $stats_data['edits'] );
+		// $formattedCommentCount = $lang->formatNum( $stats_data['comments'] );
 		// <li>
 		// 	<img src=\"{$imgPath}/voteIcon.gif\" alt=\"\" />
 		// 	{$formattedVoteCount}
@@ -100,45 +113,37 @@ class PollPage extends Article {
 		// 	<img src=\"{$imgPath}/commentsIcon.gif\" alt=\"\" />
 		// 	{$formattedCommentCount}
 		// </li>
-		$output .= '<div class="credit-box darken">
-					<h3>' . wfMessage( 'poll-submitted-by' )->text() . "</h3>
-					<div class=\"submitted-by-image\">
-						".$mAvatarAnchor."
+		$output .= '<div class="well author-container">
+					<div class="author-info">
+						'.$mAvatarAnchor."
 					</div>
-					<div class=\"submitted-by-user\">
-						<a href=\"{$user_title->getFullURL()}\">{$user_name_short}</a>
-						<ul>
-							<li>
-								<span class=\"icon-flag\"></span>
-								{$formattedVoteCount}
-							</li>
-						</ul>
-					</div>
-					<div class=\"visualClear\"></div>
-
-					<a href=\"" . htmlspecialchars( SpecialPage::getTitleFor( 'ViewPoll' )->getFullURL( 'user=' . $poll_info['user_name'] ) ) . '">'
-						. wfMessage( 'poll-view-all-by', $user_name_short, $poll_info['user_name'] )->parse() . '</a>
-
-				</div>';
-
-		$output .= '<div class="poll-stats">';
-
-		if( $wgUser->isLoggedIn() ) {
-			$output .= wfMessage(
-				'poll-voted-for',
-				'<b>' . $stats_current_user['poll_votes'] . '</b>',
-				$total_polls,
-				$lang->formatNum( $stats_current_user['poll_votes'] )
-			)->parse();
-		} else {
-			$register_title = SpecialPage::getTitleFor( 'Userlogin', 'signup' );
-			$output .= '<div class="alert alert-warning" roll="alert">' . wfMessage(
-					'poll-nologin-message',
-					htmlspecialchars( $register_title->getFullURL() )
-				)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
+					<div class=\"author-title\">
+						".Linker::userLink($poll_info['user_id'], $poll_info['user_name'])."
+					</div>";
+		if ( $profileData['about'] ) {
+			$output .= $profileData['about'];
 		}
+		$output .= '</div>'; // end of author-container
 
-		$output .= '</div>' . "\n";
+		//$output .= '<div>' // more poll by the same author
+		// $output .= '<div class="well poll-stats">';
+
+		// if( $wgUser->isLoggedIn() ) {
+		// 	$output .= wfMessage(
+		// 		'poll-voted-for',
+		// 		'<b>' . $stats_current_user['poll_votes'] . '</b>',
+		// 		$total_polls,
+		// 		$lang->formatNum( $stats_current_user['poll_votes'] )
+		// 	)->parse();
+		// } else {
+		// 	$register_title = SpecialPage::getTitleFor( 'Userlogin', 'signup' );
+		// 	$output .= '<div class="alert alert-warning" roll="alert">' . wfMessage(
+		// 			'poll-nologin-message',
+		// 			htmlspecialchars( $register_title->getFullURL() )
+		// 		)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
+		// }
+
+		// $output .= '</div>' . "\n";
 
 		$toggle_flag_label = ( ( $poll_info['status'] == 1 ) ? wfMessage( 'poll-flag-poll' )->text() : wfMessage( 'poll-unflag-poll' )->text() );
 		$toggle_flag_status = ( ( $poll_info['status'] == 1 ) ? 2 : 1 );
@@ -149,7 +154,13 @@ class PollPage extends Article {
 			$toggle_status = ( ( $poll_info['status'] == 1 ) ? 0 : 1 );
 		}
 
-		$output .= '<div class="poll-links">' . "\n";
+		$output .= '<div class="well poll-links">' . "\n";
+		// "Embed this on a wiki page" feature
+		
+		$output .= '<b>' . wfMessage( 'poll-embed' )->plain() . "</b>
+						<form name=\"embed_poll\">
+							<input name='embed_code' style='width:300px;font-size:10px;' type='text' value='$poll_embed_link' onclick='javascript:document.embed_poll.embed_code.focus();document.embed_poll.embed_code.select();' readonly='readonly' />
+						</form>\n";
 
 		$adminLinks = array();
 		// Poll administrators can access the poll admin panel
@@ -170,219 +181,19 @@ class PollPage extends Article {
 		if ( !empty( $adminLinks ) ) {
 			$output .= $lang->pipeList( $adminLinks );
 		}
+
 		$output .= "\n" . '</div>' . "\n"; // .poll-links
+		$output .= "<div class=well more-by-this-author>"."<a href=\"" 
+			. htmlspecialchars( SpecialPage::getTitleFor( 'ViewPoll' )->getFullURL( 'user=' . $poll_info['user_name'] ) ) . '">'
+			. wfMessage( 'poll-view-all-by', $user_name_short, $poll_info['user_name'] )->parse() . '</a>'."</div>";
 
-		$output .= '</div>' . "\n"; // .poll-right
-		$output .= '<div class="poll">' . "\n";
+		// $output .= $this->getOtherPolls();
 
-		$output .= "<h2 class=\"pagetitle\">投票:{$title->getText()}</h2>\n";
+		$output .= '</div>' . "\n"; // end of col-md-4
 
-		// Display question and let user vote
-		if (
-			$wgUser->isAllowed( 'pollny-vote' ) &&
-			!$p->userVoted( $wgUser->getName(), $poll_info['id'] ) &&
-			$poll_info['status'] == 1
-		)
-		{
-			if ( !$wgUser->isLoggedIn() ) {
-				$register_title = SpecialPage::getTitleFor( 'Userlogin', 'signup' );
-				$output .= '<div class="c-form-message">' . wfMessage(
-						'poll-nologin-message',
-						htmlspecialchars( $register_title->getFullURL() )
-					)->text() . '<a id="vote-login" data-toggle="modal" data-target=".user-login">登录</a>。</div>' . "\n";
-			}else{
-				$output .= '<div id="loading-poll">' . wfMessage( 'poll-js-loading' )->text() . '</div>' . "\n";
-				$output .= '<div id="poll-display" style="display:none;">' . "\n";
-				$output .= '<form name="poll"><input type="hidden" id="poll_id" name="poll_id" value="' . $poll_info['id'] . '"/>' . "\n";
-
-				foreach( $poll_info['choices'] as $choice ) {
-					$output .= '<div class="poll-choice">
-						<input type="radio" name="poll_choice" id="poll_choice" value="' . $choice['id'] . '" />'
-							. $choice['choice'] .
-					'</div>';
-				}
-
-				$output .= '</form>';
-			}
-			$output .= '</div>' . "\n";
-
-			$output .= '<div class="poll-timestamp secondary">' .
-					wfMessage( 'poll-createdago', Poll::getTimeAgo( $poll_info['timestamp'] ) )->text() .
-				'</div>' . "\n";
-
-			// $output .= "\t\t\t\t\t" . '<div class="poll-button">
-			// 		<a class="poll-skip-link" href="javascript:void(0);">' .
-			// 			wfMessage( 'poll-skip' )->text() . '</a>
-			// 	</div>';
-
-			if( $wgRequest->getInt( 'prev_id' ) ) {
-				$p = new Poll();
-				$poll_info_prev = $p->getPoll( $wgRequest->getInt( 'prev_id' ) );
-				$poll_title = Title::makeTitle( NS_POLL, $poll_info_prev['question'] );
-				$output .= '<div class="previous-poll">';
-
-				$output .= '<div class="previous-poll-title">' . wfMessage( 'poll-previous-poll' )->text() .
-					" - <a href=\"{$poll_title->getFullURL()}\">{$poll_info_prev['question']}</a></div>
-					<div class=\"previous-sub-title\">"
-						. wfMessage( 'poll-view-answered-times', $poll_info_prev['votes'] )->parse() .
-					'</div>';
-
-				$x = 1;
-
-				foreach( $poll_info_prev['choices'] as $choice ) {
-					if( $poll_info_prev['votes']  > 0 ) {
-						$percent = round( $choice['votes'] / $poll_info_prev['votes'] * 100 );
-						$bar_width = floor( 360 * ( $choice['votes'] / $poll_info_prev['votes'] ) );
-					} else {
-						$percent = 0;
-						$bar_width = 0;
-					}
-
-					if ( empty( $choice['votes'] ) ) {
-						$choice['votes'] = 0;
-					}
-
-					$bar_img = '<img src="' . $wgExtensionAssetsPath . '/SocialProfile/images/vote-bar-' . $x .
-						'.gif" class="image-choice-' . $x .
-						'" style="width:' . $bar_width . 'px;height:11px;"/>';
-					$output .= "<div class=\"poll-choice\">
-								<div class=\"poll-choice-left\">{$choice['choice']} ({$percent}%)</div>";
-
-					$output .= "<span class=\"poll-choice-votes\">" .
-							wfMessage( 'poll-votes', $choice['votes'] )->parse() .
-						"</span><div class=\"poll-choice-right primary\" style=\"width:{$percent}%\"> </div>";
-
-					$output .= '</div>';
-
-					$x++;
-				}
-				$output .= '</div>';
-			}
-		} else {
-			$show_results = true;
-			// Display message if poll has been closed for voting
-			if( $poll_info['status'] == 0 ) {
-				$output .= '<div class="poll-closed">' .
-					wfMessage( 'poll-closed' )->text() . '</div>';
-			}
-
-			// Display message if poll has been flagged
-			if( $poll_info['status'] == 2 ) {
-				$output .= '<div class="poll-closed">' .
-					wfMessage( 'poll-flagged' )->text() . '</div>';
-				if( !$wgUser->isAllowed( 'polladmin' ) ) {
-					$show_results = false;
-				}
-			}
-
-			if( $show_results ) {
-				$x = 1;
-
-				foreach( $poll_info['choices'] as $choice ) {
-					if( $poll_info['votes'] > 0 ) {
-						$percent = round( $choice['votes'] / $poll_info['votes'] * 100 );
-						$bar_width = floor( 480 * ( $choice['votes'] / $poll_info['votes'] ) );
-					} else {
-						$percent = 0;
-						$bar_width = 0;
-					}
-
-					// If it's not set, it means that no-one has voted for that
-					// choice yet...it also means that we need to set it
-					// manually here so that i18n displays properly
-					if ( empty( $choice['votes'] ) ) {
-						$choice['votes'] = 0;
-					}
-					$bar_img = "<img src=\"{$wgExtensionAssetsPath}/SocialProfile/images/vote-bar-{$x}.gif\" class=\"image-choice-{$x}\" style=\"width:{$bar_width}px;height:12px;\"/>";
-
-					$output .= "<div class=\"poll-choice\">
-					<div class=\"poll-choice-left\">{$choice['choice']} ({$percent}%)</div>";
-
-					$output .= "<span class=\"poll-choice-votes\">"
-						. wfMessage( 'poll-votes', $choice['votes'] )->parse() .
-					"</span>";
-					$output .= self::getFollowingUserPolls($choice['vote_users']);
-
-					// $choice_user = $choice['vote_users'];
-					// if ( count( $choice_user ) > 0 ) {
-					// 	$following_voter = array();
-					// 	foreach ( $choice_user as $key => $value) {
-					// 		// echo $value['pv_user_name'];die();
-					// 		if( in_array( $value['pv_user_name'], $f_all_user ) && !in_array( $value['pv_user_name'], $following_voter ) ){
-					// 			$following_voter[] = $value['pv_user_name'];
-					// 		}
-					// 	}
-					// 	if ( count($following_voter) > 0 ) {
-					// 		$follow_vote_user = '';
-					// 		if ( count($following_voter) > 4 ) {
-					// 			// Linker::link( $userPage, $following_voter[0], array(), array() );
-					// 			$follow_vote_user = Linker::link( User::newFromName($following_voter[0])->getUserPage(), $following_voter[0], array(), array() )."、".
-					// 								Linker::link( User::newFromName($following_voter[1])->getUserPage(), $following_voter[1], array(), array() )."、".
-					// 								Linker::link( User::newFromName($following_voter[2])->getUserPage(), $following_voter[2], array(), array() )."、".
-					// 								Linker::link( User::newFromName($following_voter[3])->getUserPage(), $following_voter[3], array(), array() )."等";
-					// 		}else{
-					// 			for ($i=0; $i < count($following_voter); $i++) { 
-					// 				$follow_vote_user .= Linker::link( User::newFromName($following_voter[$i])->getUserPage(), $following_voter[$i], array(), array() );
-					// 				if ($i == count($following_voter)-2 ){
-					// 					$follow_vote_user .= '和';
-					// 				}else {
-					// 					$follow_vote_user .= '&nbsp;';
-					// 				}
-					// 			}
-					// 		}
-					// 		$output .= "<span class=\"poll-user\">".wfMessage('poll-user')->params($follow_vote_user)->text()."</span>";
-					// 	}
-
-					// }
-					
-					// $output .="<span class=\"poll-user\">(who也投了此选项)</span>";
-					$output .= "<div class=\"poll-choice-right primary\" style=\"width:{$percent}%\"> </div></div>";
-
-					$x++;
-				}
-			}
-
-			$output .= '<div class="poll-total-votes">(' .
-				wfMessage( 'poll-based-on-votes', $poll_info['votes'] )->parse() .
-			')</div>
-			<div class="poll-timestamp">' .
-				wfMessage( 'poll-createdago', Poll::getTimeAgo( $poll_info['timestamp'] ) )->parse() .
-			'</div>
-
-
-			<div class="poll-button">
-				<input type="hidden" id="poll_id" name="poll_id" value="' . $poll_info['id'] . '" />
-				<a class="poll-next-poll-link" href="javascript:void(0);">' .
-					wfMessage( 'poll-next-poll' )->text() . '</a>
-			</div>';
-		}
-
-		// "Embed this on a wiki page" feature
-		$poll_embed_name = htmlspecialchars( $title->getText(), ENT_QUOTES );
-		$output .= '<br />
-			<table cellpadding="0" cellspacing="2" border="0">
-				<tr>
-					<td>
-						<b>' . wfMessage( 'poll-embed' )->plain() . "</b>
-					</td>
-					<td>
-						<form name=\"embed_poll\">
-							<input name='embed_code' style='width:300px;font-size:10px;' type='text' value='<pollembed id=\"{$poll_info['id']}\" title=\"{$poll_embed_name}\" />' onclick='javascript:document.embed_poll.embed_code.focus();document.embed_poll.embed_code.select();' readonly='readonly' />
-						</form>
-					</td>
-				</tr>
-			</table>\n";
-
-		$output .= '</div>' . "\n"; // .poll
-
-		$output .= '<div class="visualClear"></div>';
-
-		$wgOut->addHTML( $output );
-
-		global $wgPollDisplay;
-		if( $wgPollDisplay['comments'] ) {
-			$wgOut->addWikiText( '<comments/>' );
-		}
+		$wgOut->addHtml($output);
+		$wgOut->addWikiText( '<div class="clearfix"></div><comments/>' );
+		
 	}
 	public static function getFollowingUserPolls($choice_user){
 		global $wgUser;
