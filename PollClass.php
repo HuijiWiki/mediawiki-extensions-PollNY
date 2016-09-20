@@ -8,11 +8,11 @@ class Poll {
 	 * Adds a poll question to the database.
 	 *
 	 * @param $question String: poll question
-	 * @param $image String: name of the poll image, if any
+	 * @param $multi bool: if the poll is multiple choice.
 	 * @param $pageID Integer: page ID, as returned by Article::getID()
 	 * @return Integer: inserted value of an auto-increment row (poll ID)
 	 */
-	public function addPollQuestion( $question, $image, $pageID ) {
+	public function addPollQuestion( $question, $multi = 1, $pageID ) {
 		global $wgUser;
 		$dbw = wfGetDB( DB_MASTER );
 		$dbw->insert(
@@ -22,7 +22,7 @@ class Poll {
 				'poll_user_id' => $wgUser->getID(),
 				'poll_user_name' => $wgUser->getName(),
 				'poll_text' => strip_tags( $question ),
-				'poll_image' => $image,
+				'poll_image' => $multi,
 				'poll_date' => date( 'Y-m-d H:i:s' ),
 				'poll_random' => wfRandom()
 			),
@@ -85,6 +85,42 @@ class Poll {
 	}
 
 	/**
+	 * Adds a record to the poll_user_vote table to signify that the user has
+	 * already voted.
+	 *
+	 * @param $pollID Integer: ID number of the poll
+	 * @param $choiceID array of Integers: numbers of the choice
+	 */
+	public function addPollVoteMulti( $pageId, $pollID, $choiceIDs ) {
+		global $wgUser;
+		$dbw = wfGetDB( DB_MASTER );
+		foreach ($choiceIDs as $choiceId) {
+			$dbw->insert(
+				'poll_user_vote',
+				array(
+					'pv_poll_id' => $pollID,
+					'pv_pc_id' => $choiceId,
+					'pv_user_id' => $wgUser->getID(),
+					'pv_user_name' => $wgUser->getName(),
+					'pv_date' => date( 'Y-m-d H:i:s' )
+				),
+				__METHOD__
+			);	
+			$this->incChoiceVoteCount( $choiceId );		
+		}
+		if ( $pageId != null ) {
+			self::clearPollCache( $pageId, $wgUser->getID() );
+		}
+		if( count($choiceIDs) > 0 ) {
+			$this->incPollVoteCount( $pollID );
+			$stats = new UserStatsTrack( $wgUser->getID(), $wgUser->getName() );
+			$stats->incStatField( 'poll_vote' );
+			self::sendEchoNotification($pollID);
+		}
+	}
+
+
+	/**
 	 * Increases the total amount of votes an answer choice has by one and
 	 * commits to DB.
 	 *
@@ -120,6 +156,7 @@ class Poll {
 	 *
 	 * @param $pageID Integer: page ID number
 	 * @return Array: poll information, such as question, choices, status, etc.
+	 * TODO: findout why this is referenced by page id instead of poll id.
 	 */
 	public function getPoll( $pageID ) {
 		$dbr = wfGetDB( DB_SLAVE );
@@ -138,7 +175,7 @@ class Poll {
 		$poll = array();
 		if( $row ) {
 			$poll['question'] = $row->poll_text;
-			$poll['image'] = $row->poll_image;
+			$poll['multi'] = $row->poll_image?$row->poll_image:'1';
 			$poll['user_name'] = $row->poll_user_name;
 			$poll['user_id'] = $row->poll_user_id;
 			$poll['votes'] = $row->poll_vote_count;
@@ -218,6 +255,15 @@ class Poll {
 			}
 			return $result;
 		}
+	}
+	/**
+	 * get maximum number of choices can be made
+	 * @param $poll_id Integer: poll ID number
+	 * @return Integer: number of choices can be made at once
+	 */
+	public function getMultiLimit( $page_id ){
+		$poll =  $this->getPoll($page_id);
+		return $poll['multi'];	
 	}
 
 	/**
@@ -388,7 +434,7 @@ class Poll {
 				$polls[] = array(
 					'title' => $row->page_title,
 					'timestamp' => $row->poll_date,
-					'image' => $row->poll_image,
+					'multi' => $row->poll_image,
 					'choices' => self::getPollChoices( $row->poll_id, $row->poll_vote_count )
 				);
 			}

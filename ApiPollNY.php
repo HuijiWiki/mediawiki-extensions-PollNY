@@ -34,7 +34,7 @@ class ApiPollNY extends ApiBase {
 		// Ensure that the pollID parameter is present for actions that require
 		// it and that it really is numeric
 		if (
-			in_array( $action, array( 'delete', 'updateStatus', 'vote' ) ) &&
+			in_array( $action, array( 'delete', 'updateStatus', 'vote', 'multiVote' ) ) &&
 			( !$pollID || $pollID === null || !is_numeric( $pollID ) )
 		)
 		{
@@ -62,6 +62,18 @@ class ApiPollNY extends ApiBase {
 			if ( !$choiceID || $choiceID === null || !is_numeric( $choiceID ) || !$pageId || $pageId === null || !is_numeric( $pageId ) ) {
 				$this->dieUsageMsg( 'missingparam' );
 			}
+		} elseif ( $action == 'multiVote' ){
+			$choiceIDs = $params['choiceIDs'];
+			$pageId = $params['pageID'];
+			if ( !$choiceIDs || $choiceIDs === null || !is_array( $choiceIDs ) || !$pageId || $pageId === null || !is_numeric( $pageId ) ) {
+				$this->dieUsageMsg( 'missingparam' );
+			}
+			foreach ($choiceIDs as $value) {
+				if (!is_numeric((int)$value)){
+					$this->dieUsageMsg( 'missingparam' );
+				}
+			}
+
 		}
 
 		// Set the private class member variable
@@ -86,6 +98,9 @@ class ApiPollNY extends ApiBase {
 				break;
 			case 'vote':
 				$output = $this->vote( $pageId, $pollID, (int) $params['choiceID'] );
+				break;
+			case 'multiVote':
+			    $output = $this->multiVote($pageId, $pollID, $choiceIDs);
 				break;
 			case 'render':
 				$output = $this->render($params['pollName']);
@@ -226,7 +241,20 @@ class ApiPollNY extends ApiBase {
 
 		return 'OK';
 	}
-
+	function multiVote( $pageId, $pollID, $choiceIDs ) {
+		$user = $this->getUser();
+		if ( !$user->isAllowed( 'pollny-vote' ) || count($choiceIDs) > $this->poll->getMultiLimit($pageId) ) {
+			return  'user has no right or limit exceed'.$this->poll->getMultiLimit($pageId);
+		}
+		if (
+			!$this->poll->userVoted( $user->getName(), $pollID ) &&
+			$user->isAllowed( 'pollny-vote' )
+		)
+		{
+			$this->poll->addPollVoteMulti( $pageId, $pollID, $choiceIDs );
+		}
+		return 'OK';
+	}
 	/**
 	 * @deprecated since MediaWiki core 1.25
 	 */
@@ -260,6 +288,10 @@ class ApiPollNY extends ApiBase {
 			),
 			'pollName' => array(
 				ApiBase::PARAM_TYPE => 'string',
+			),
+			'choiceIDs' => array(
+				ApiBase::PARAM_ISMULTI => true,
+				ApiBase::PARAM_ISMULTI => 'integer',
 			),
 		);
 	}
@@ -303,16 +335,27 @@ class ApiPollNY extends ApiBase {
 							htmlspecialchars( $register_title->getFullURL() )
 						)->text() . '<a class="need-login">登录</a>。</div>' . "\n";
 				}else{
+					if ($poll_info['multi'] == 1){
+						$choiceType = 'radio';
+						$notice = wfMessage('poll-single-choice')->text();
+					} else {
+						$choiceType = 'checkbox';
+						$notice = wfMessage('poll-multiple-choices')->params($poll_info['multi'])->text();
+					}
 					$wgOut->addModules( 'ext.pollNY' );
+					$output .= "<code>".$notice."</code>";
 					$output .= "<div id=\"loading-poll_{$poll_info['id']}\" class=\"poll-loading-msg\"></div>";
 					$output .= "<div id=\"poll-display_{$poll_info['id']}\" style=\"display;\">";
 					$output .= "<form name=\"poll_{$poll_info['id']}\"><input type=\"hidden\" id=\"poll_id_{$poll_info['id']}\" name=\"poll_id_{$poll_info['id']}\" value=\"{$poll_info['id']}\"/>";
 
 					foreach( $poll_info['choices'] as $choice ) {
 						$output .= "<div class=\"poll-choice\">
-						<input type=\"radio\" name=\"poll_choice\" data-poll-id=\"{$poll_info['id']}\" data-poll-page-id=\"{$poll_page_id}\" id=\"poll_choice\" value=\"{$choice['id']}\">{$choice['choice']}
+						<input type=\"{$choiceType}\" name=\"poll_choice\" data-poll-id=\"{$poll_info['id']}\" data-poll-page-id=\"{$poll_page_id}\" id=\"poll_choice\" value=\"{$choice['id']}\">{$choice['choice']}
 						</div>";
 					}
+					$output .= '<div class="btn btn-success poll_vote" data-limit="'.$poll_info['multi'].'" data-type="'
+						.$choiceType.'" data-poll-id="'.$poll_info['id'].'" data-poll-page-id="'
+						.$poll_page_id.'" disabled>投票</div>';
 
 					$output .= '</form>';
 				}

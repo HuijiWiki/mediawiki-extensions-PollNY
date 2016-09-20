@@ -211,6 +211,23 @@ var PollNY = {
 		displayElement.style.visibility = 'visible';
 	},
 
+	enableButton: function( id ){
+		var $vote = $('.poll_vote');
+		$vote.each(function(){
+			var limit = $(this).data('limit');
+			for (var i = 0, checked = 0; i < $(this).siblings('.poll-choice').length; i ++){
+				if ($($(this).siblings('.poll-choice')[i]).children('input').prop('checked') == true){
+					checked++;
+				}
+			}
+			if (checked > 0 && checked <= limit){
+				$(this).attr('disabled', false);
+			} else {
+				$(this).attr('disabled', true);
+			}
+		});
+	},
+
 	/**
 	 * Cast a vote for an embedded poll.
 	 *
@@ -239,6 +256,37 @@ var PollNY = {
 					pageID: mw.config.get('wgArticleId'),
 					pollID: id,
 					choiceID: choice_id,
+					format: 'json'
+				}
+			} ).done( function() {
+				PollNY.showResults( id, pageId );
+			} );
+		}
+	},
+
+	pollEmbedVoteMulti: function( id, pageId ){
+		console.log('casting multiple vote' + id);
+		var choice_ids = [];
+		var poll_form = eval( 'document.poll_'	+ id + '.poll_choice' );
+
+		for ( var i = 0; i < poll_form.length; i++ ){
+			if ( poll_form[i].checked ){
+				choice_ids.push( poll_form[i].value ); 
+			}
+		}
+		console.log(choice_ids);
+		
+		if ( choice_ids.length ) {
+			// Cast vote
+			jQuery.ajax({
+				type: 'POST',
+				url: mw.util.wikiScript( 'api' ),
+				data: {
+					action: 'pollny',
+					what: 'multiVote',
+					pageID: mw.config.get('wgArticleId'),
+					pollID: id,
+					choiceIDs: choice_ids.join('|'),
 					format: 'json'
 				}
 			} ).done( function() {
@@ -339,6 +387,9 @@ var PollNY = {
 				elem = document.getElementById( 'poll_answer_' + ( x + 1 ) );
 				elem.style.display = 'block';
 				elem.style.visibility = 'visible';
+				elem = document.getElementById( 'poll_limit_' + ( x ) );
+				elem.style.display = 'block';
+				elem.style.visibility = 'visible';				
 			}
 		}
 	},
@@ -398,10 +449,22 @@ var PollNY = {
 	 * with the exact same title.
 	 */
 	create: function() {
-		var answers = 0;
+		var answers = 0, limit = 'single';
 		for( var x = 1; x <= 9; x++ ) {
 			if( document.getElementById( 'answer_' + x ).value ) {
 				answers++;
+			}
+		}
+		var radios = document.getElementsByName('limit');
+
+		for( var i = 0, length = radios.length; i < length; i++){
+			if ( radios[i].checked ){
+				limit = radios[i].value;
+				if (limit > answers){
+					alert( mw.msg('poll-limit-is-greater-than-anwsers') );
+					return '';
+				}
+				break;
 			}
 		}
 
@@ -459,9 +522,9 @@ jQuery( document ).ready( function() {
 			PollNY.toggleStatus( jQuery( this ).data( 'status' ) );
 		} );
 
-		jQuery( 'div.poll-choice input[type="radio"]' ).on( 'click', function() {
-			PollNY.vote();
-		} );
+		// jQuery( 'div.poll-choice input[type="radio"]' ).on( 'click', function() {
+		// 	PollNY.vote();
+		// } );
 
 		// jQuery( 'a.poll-skip-link' ).on( 'click', function() {
 		// 	PollNY.skip();
@@ -491,14 +554,26 @@ jQuery( document ).ready( function() {
 					var pollID = id.replace( /loading-poll_/, '' );
 					PollNY.showEmbedPoll( pollID );
 				}
+				jQuery( 'div.poll-choice input' ).on( 'click', function() {
+					PollNY.enableButton( pollID );
+				});
 
 				// Handle clicks on the options
-				jQuery( 'div.poll-choice input[type="radio"]' ).on( 'click', function() {
-					PollNY.pollEmbedVote(
-						jQuery( this ).data( 'poll-id' ),
-						jQuery( this ).data( 'poll-page-id' )
-					);
+				jQuery( '.poll_vote:not(\'[disabled]\'' ).on( 'click', function() {
+					if ($(this).data('type') == 'radio'){
+						PollNY.pollEmbedVote(
+							jQuery( this ).data( 'poll-id' ),
+							jQuery( this ).data( 'poll-page-id' )
+						);						
+					} else {
+						PollNY.pollEmbedVoteMulti(
+							jQuery( this ).data( 'poll-id' ),
+							jQuery( this ).data( 'poll-page-id' )
+						);							
+					}
+
 				} );
+
 			}
 		});	
 
@@ -516,11 +591,18 @@ jQuery( document ).ready( function() {
 		}
 
 		// Handle clicks on the options
-		jQuery( 'div.poll-choice input[type="radio"]' ).on( 'click', function() {
-			PollNY.pollEmbedVote(
-				jQuery( this ).data( 'poll-id' ),
-				jQuery( this ).data( 'poll-page-id' )
-			);
+		jQuery( '.poll_vote' ).on( 'click', function() {
+			if ($(this).data('type') == 'radio'){
+				PollNY.pollEmbedVote(
+					jQuery( this ).data( 'poll-id' ),
+					jQuery( this ).data( 'poll-page-id' )
+				);						
+			} else {
+				PollNY.pollEmbedVoteMulti(
+					jQuery( this ).data( 'poll-id' ),
+					jQuery( this ).data( 'poll-page-id' )
+				);							
+			}
 		} );
 	}
 

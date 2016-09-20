@@ -119,5 +119,8 @@
 	"echo-pref-tooltip-poll-msg":"当有人参与我发起的投票时通知我",
 	"notification-bundle-header-poll-msg":"您有$1条投票消息。",
 	"notification-header-poll-msg":"$1参与了您的投票。",
-	"notification-view-poll":"查看投票"
+	"notification-view-poll":"查看投票",
+	"poll-limit-is-greater-than-anwsers":"选择数量限制不能超过选项数量。",
+	"poll-single-choice":"该投票为单选。",
+	"poll-multiple-choices":"该投票限选$1项"
 }

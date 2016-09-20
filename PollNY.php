@@ -109,7 +109,7 @@ $wgResourceModules['ext.pollNY'] = array(
 		// SpecialCreatePoll.php / create-poll.tmpl.php
 		'poll-createpoll-error-nomore', 'poll-upload-new-image',
 		'poll-atleast', 'poll-enterquestion', 'poll-hash',
-		'poll-pleasechoose',
+		'poll-pleasechoose', 'poll-limit-is-greater-than-anwsers',
 	),
 	'dependencies' => array(
 		'ext.socialprofile.flash',

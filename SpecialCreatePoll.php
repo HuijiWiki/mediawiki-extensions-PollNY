@@ -124,7 +124,7 @@ class CreatePoll extends SpecialPage {
 			// echo $request->getVal( 'poll_question' );die();
 			$poll_id = $p->addPollQuestion(
 				$request->getVal( 'poll_question' ),
-				$request->getVal( 'poll_image_name' ),
+				$request->getVal( 'limit' ),
 				$newPageId
 			);
 
