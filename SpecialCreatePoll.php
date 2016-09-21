@@ -143,6 +143,7 @@ class CreatePoll extends SpecialPage {
 			// $key = wfMemcKey( 'user', 'profile', 'polls', $user->getID() );
 			// $wgMemc->delete( $key );
 			Poll::clearPollCache( $article->getID(), $user->getID() );
+			Hooks::run('PollNY::create', [$this, $poll_id, $request->getVal( 'poll_question' ), $request->getVal( 'limit' )]);
 
 			// Redirect to new poll page
 			$out->redirect( $poll_title->getFullURL() );

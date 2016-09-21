@@ -97,10 +97,10 @@ class ApiPollNY extends ApiBase {
 				$output = $this->titleExists( $params['pageName'] );
 				break;
 			case 'vote':
-				$output = $this->vote( $pageId, $pollID, (int) $params['choiceID'] );
+				$output = $this->vote( $pageID, $pollID, (int) $params['choiceID'] );
 				break;
 			case 'multiVote':
-			    $output = $this->multiVote($pageId, $pollID, $choiceIDs);
+			    $output = $this->multiVote($pageID, $pollID, $choiceIDs);
 				break;
 			case 'render':
 				$output = $this->render($params['pollName']);
@@ -238,7 +238,6 @@ class ApiPollNY extends ApiBase {
 		{
 			$this->poll->addPollVote( $pageId, $pollID, $choiceID );
 		}
-
 		return 'OK';
 	}
 	function multiVote( $pageId, $pollID, $choiceIDs ) {
