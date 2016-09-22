@@ -537,7 +537,7 @@ jQuery( document ).ready( function() {
 	}
 	$('.pollembed-wrap').each(function(){
 		//request poll
-		$this = $(this);
+		var $this = $(this);
 		var api = new mw.Api();
 		api.get({
 			action : "pollny",

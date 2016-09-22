@@ -81,7 +81,7 @@ class Poll {
 			$stats = new UserStatsTrack( $wgUser->getID(), $wgUser->getName() );
 			$stats->incStatField( 'poll_vote' );
 			self::sendEchoNotification($pollID);
-			Hooks::run('PollNY::voted', [$pageId, $pollID, [$choiceID]] );
+			Hooks::run('PollNY::vote', [$pageId, $pollID, [$choiceID]] );
 		}
 	}
 
