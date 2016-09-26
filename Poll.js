@@ -222,8 +222,24 @@ var PollNY = {
 			}
 			if (checked > 0 && checked <= limit){
 				$(this).attr('disabled', false);
+                                        // Handle clicks on the options
+                                        jQuery( '.poll_vote:not([disabled])' ).on( 'click', function() {
+                                                if ($(this).data('type') == 'radio'){
+                                                        PollNY.pollEmbedVote(
+                                                                jQuery( this ).data( 'poll-id' ),
+                                                                jQuery( this ).data( 'poll-page-id' )
+                                                        );
+                                                } else {
+                                                        PollNY.pollEmbedVoteMulti(
+                                                                jQuery( this ).data( 'poll-id' ),
+                                                                jQuery( this ).data( 'poll-page-id' )
+                                                        );
+                                                }
+
+                               		} );
 			} else {
 				$(this).attr('disabled', true);
+				$('.poll_vote[disabled]').off('click');
 			}
 		});
 	},
@@ -560,6 +576,8 @@ jQuery( document ).ready( function() {
 
 				// Handle clicks on the options
 				jQuery( '.poll_vote:not([disabled])' ).on( 'click', function() {
+					console.log(this);
+					console.log(PollNY.pollEmbedVote);
 					if ($(this).data('type') == 'radio'){
 						PollNY.pollEmbedVote(
 							jQuery( this ).data( 'poll-id' ),
