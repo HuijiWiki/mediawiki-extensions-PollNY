@@ -559,7 +559,7 @@ jQuery( document ).ready( function() {
 				});
 
 				// Handle clicks on the options
-				jQuery( '.poll_vote:not(\'[disabled]\'' ).on( 'click', function() {
+				jQuery( '.poll_vote:not(\'[disabled]\')' ).on( 'click', function() {
 					if ($(this).data('type') == 'radio'){
 						PollNY.pollEmbedVote(
 							jQuery( this ).data( 'poll-id' ),
