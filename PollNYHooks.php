@@ -25,7 +25,7 @@ class PollNYHooks {
 	 * @param $newid Integer: new ID of the page [unused]
 	 * @return Boolean: true
 	 */
-	public static function updatePollQuestion( &$title, &$newTitle, &$user, $oldid, $newid ) {
+	public static function updatePollQuestion( &$title, &$newTitle, $user, $oldid, $newid ) {
 		if( $title->getNamespace() == NS_POLL ) {
 			$dbw = wfGetDB( DB_MASTER );
 			$dbw->update(
@@ -47,7 +47,7 @@ class PollNYHooks {
 	 * @param $reason Mixed: deletion reason (unused)
 	 * @return Boolean: true
 	 */
-	public static function deletePollQuestion( &$article, &$user, $reason ) {
+	public static function deletePollQuestion( &$article, $user, $reason ) {
 		global $wgSupressPageTitle;
 
 		if( $article->getTitle()->getNamespace() == NS_POLL ) {
