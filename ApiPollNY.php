@@ -58,14 +58,14 @@ class ApiPollNY extends ApiBase {
 			}
 		} elseif ( $action == 'vote' ) {
 			$choiceID = $params['choiceID'];
-			$pageId = $params['pageID'];
-			if ( !$choiceID || $choiceID === null || !is_numeric( $choiceID ) || !$pageId || $pageId === null || !is_numeric( $pageId ) ) {
+			$pageID = $params['pageID'];
+			if ( !$choiceID || $choiceID === null || !is_numeric( $choiceID ) || !$pageID || $pageID === null || !is_numeric( $pageID ) ) {
 				$this->dieUsageMsg( 'missingparam' );
 			}
 		} elseif ( $action == 'multiVote' ){
 			$choiceIDs = $params['choiceIDs'];
-			$pageId = $params['pageID'];
-			if ( !$choiceIDs || $choiceIDs === null || !is_array( $choiceIDs ) || !$pageId || $pageId === null || !is_numeric( $pageId ) ) {
+			$pageID = $params['pageID'];
+			if ( !$choiceIDs || $choiceIDs === null || !is_array( $choiceIDs ) || !$pageID || $pageID === null || !is_numeric( $pageID ) ) {
 				$this->dieUsageMsg( 'missingparam' );
 			}
 			foreach ($choiceIDs as $value) {

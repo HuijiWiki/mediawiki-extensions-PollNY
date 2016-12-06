@@ -106,7 +106,7 @@ class Poll {
 					'pv_date' => date( 'Y-m-d H:i:s' )
 				),
 				__METHOD__
-			);	
+			);
 			$this->incChoiceVoteCount( $choiceId );		
 		}
 		if ( $pageId != null ) {
@@ -118,6 +118,7 @@ class Poll {
 			$stats->incStatField( 'poll_vote' );
 			self::sendEchoNotification($pollID);
 			Hooks::run('PollNY::vote', [$pageId, $pollID, $choiceIDs] );
+		
 		}
 	}
 
