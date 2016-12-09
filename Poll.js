@@ -221,7 +221,9 @@ var PollNY = {
 				}
 			}
 			if (checked > 0 && checked <= limit){
-				$(this).attr('disabled', false);
+				if ($(this).attr('disabled'))
+				{
+					$(this).attr('disabled', false);
                                         // Handle clicks on the options
                                         jQuery( '.poll_vote:not([disabled])' ).on( 'click', function() {
                                                 if ($(this).data('type') == 'radio'){
@@ -237,6 +239,7 @@ var PollNY = {
                                                 }
 
                                		} );
+				}
 			} else {
 				$(this).attr('disabled', true);
 				$('.poll_vote[disabled]').off('click');
